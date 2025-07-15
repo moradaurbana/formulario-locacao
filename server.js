@@ -2,7 +2,7 @@
 require('dotenv').config();
 
 // 2. Importa as bibliotecas necessárias
-const express = require('express');         // Framework web
+const express = require('express');        // Framework web
 const multer = require('multer');           // Lida com upload de arquivos
 const nodemailer = require('nodemailer');   // Envia e-mails
 const mongoose = require('mongoose');       // Interage com MongoDB
@@ -31,44 +31,40 @@ mongoose.connect(MONGO_URI)
     .catch(err => console.error('Erro ao conectar ao MongoDB:', err));
 
 // --- Configuração do CORS (Cross-Origin Resource Sharing) ---
-// Permite que o seu frontend (em um domínio diferente, como GitHub Pages)
-// faça requisições para este backend.
 app.use(cors({
-    origin: FRONTEND_URL, // Define qual URL pode acessar este backend
-    methods: ['GET', 'POST'], // Métodos HTTP permitidos
-    allowedHeaders: ['Content-Type'] // Cabeçalhos permitidos
+    origin: FRONTEND_URL,
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type']
 }));
 
+// --- Adicionar middleware para servir arquivos estáticos ---
+// Isso faz com que a pasta 'public' seja acessível diretamente via URL.
+// Por exemplo, se success.html estiver em 'public/success.html', você poderá acessá-lo em /success.html
+app.use(express.static(path.join(__dirname, 'public')));
+
 // --- Configuração do Multer para upload de arquivos ---
-// 'dest: uploads/' diz ao Multer para salvar os arquivos recebidos na pasta 'uploads/'
-// ATENÇÃO: Em produção (Heroku), arquivos salvos localmente são temporários e podem ser perdidos.
-// Para uma solução robusta em produção, você deve usar um serviço de armazenamento em nuvem (AWS S3, Google Cloud Storage)
-// e salvar as URLs dos arquivos no MongoDB, em vez dos caminhos locais.
 const upload = multer({ dest: 'uploads/' });
 
 // --- Configuração do Nodemailer para envio de e-mails ---
 const transporter = nodemailer.createTransport({
-    service: 'gmail', // Você pode usar 'outlook', 'sendgrid', etc., dependendo do seu provedor
+    service: 'gmail',
     auth: {
-        user: EMAIL_USER, // Seu email de envio
-        pass: EMAIL_PASS  // Sua senha de email ou senha de aplicativo (se for Gmail com 2FA)
+        user: EMAIL_USER,
+        pass: EMAIL_PASS
     }
 });
 
 // --- Middlewares Essenciais ---
-// app.use(express.json()); // Para parsear (interpretar) requisições com corpo JSON (não é o principal para formulários, mas é bom ter)
-app.use(express.urlencoded({ extended: true })); // Para parsear dados de formulário enviados via URL-encoded (formato padrão do formulário HTML)
+app.use(express.urlencoded({ extended: true }));
 
 // --- Rota de Teste (opcional) ---
-// Se você acessar a URL do seu backend no navegador, verá esta mensagem
 app.get('/', (req, res) => {
-    res.send('Servidor do formulário está online e funcionando!');
+    // Redireciona para o index.html quando a rota raiz for acessada
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // --- Rota Principal para Receber e Processar o Formulário ---
-// 'upload.fields' é usado quando você tem múltiplos campos de upload de arquivo com nomes diferentes
 app.post('/submit-locacao', upload.fields([
-    // Define os campos de arquivo que o Multer deve esperar
     { name: 'doc-rg-locatario', maxCount: 1 },
     { name: 'doc-cpf-locatario', maxCount: 1 },
     { name: 'doc-comp-renda-locatario', maxCount: 1 },
@@ -80,22 +76,18 @@ app.post('/submit-locacao', upload.fields([
     { name: 'doc-comp-renda-conjuge', maxCount: 1 },
     { name: 'doc-ir-conjuge', maxCount: 1 }
 ]), async (req, res) => {
-    const formData = req.body; // Contém todos os campos de texto do formulário
-    const uploadedFiles = req.files; // Contém os arquivos enviados, organizados por nome do campo
+    const formData = req.body;
+    const uploadedFiles = req.files;
 
-    // Log para depuração: veja o que o formulário enviou
     console.log('Dados do formulário recebidos:', formData);
     console.log('Arquivos recebidos:', uploadedFiles);
 
-    // 1. Mapear os dados do formulário para o nosso modelo do MongoDB
-    // Os nomes das chaves aqui devem corresponder aos nomes definidos no models/Locacao.js
-    // Os valores vêm de formData (campos de texto) ou uploadedFiles (caminhos dos arquivos)
     const newLocacao = new Locacao({
         nome: formData.nome,
         cpf: formData.cpf,
         rg: formData.rg,
         nascimento: formData.nascimento,
-        estadoCivil: formData['estado-civil'], // Nome do campo no HTML é 'estado-civil'
+        estadoCivil: formData['estado-civil'],
         profissao: formData.profissao,
         celular: formData.celular,
         email: formData.email,
@@ -119,8 +111,6 @@ app.post('/submit-locacao', upload.fields([
         cidadeCom: formData['cidade-com'],
         estadoCom: formData['estado-com'],
 
-        // Aqui, armazenamos o 'path' (caminho temporário) do arquivo que o Multer salvou.
-        // Se o arquivo não foi enviado (campo opcional), será 'null'.
         docRgLocatario: uploadedFiles['doc-rg-locatario'] ? uploadedFiles['doc-rg-locatario'][0].path : null,
         docCpfLocatario: uploadedFiles['doc-cpf-locatario'] ? uploadedFiles['doc-cpf-locatario'][0].path : null,
         docCompRendaLocatario: uploadedFiles['doc-comp-renda-locatario'] ? uploadedFiles['doc-comp-renda-locatario'][0].path : null,
@@ -134,11 +124,9 @@ app.post('/submit-locacao', upload.fields([
     });
 
     try {
-        // 2. Salvar os dados do formulário no MongoDB
         await newLocacao.save();
         console.log('Dados do formulário salvos no MongoDB.');
 
-        // 3. Preparar o corpo do e-mail em HTML
         let emailBody = `
             <h1>Nova Ficha Cadastral para Locação</h1>
             <p>Recebida em: ${new Date().toLocaleString('pt-BR')}</p>
@@ -180,7 +168,6 @@ app.post('/submit-locacao', upload.fields([
                 <li><strong>Estado Empresa:</strong> ${formData['estado-com'] || 'Não informado'}</li>
             </ul>
         `;
-        // Adicionar dados do cônjuge se o estado civil for "casado" ou "uniao-estavel"
         if (formData['estado-civil'] === 'casado' || formData['estado-civil'] === 'uniao-estavel') {
             emailBody += `
                 <hr>
@@ -189,54 +176,48 @@ app.post('/submit-locacao', upload.fields([
             `;
         }
 
-        // 4. Preparar os anexos do e-mail
         const attachments = [];
-        // Itera sobre todos os campos de upload que o Multer processou
         for (const fieldName in uploadedFiles) {
             uploadedFiles[fieldName].forEach(file => {
                 attachments.push({
-                    filename: file.originalname, // Nome original do arquivo
-                    path: file.path // Caminho temporário onde o Multer salvou o arquivo
+                    filename: file.originalname,
+                    path: file.path
                 });
             });
         }
 
         const mailOptions = {
-            from: EMAIL_USER, // Seu e-mail de envio (configurado no .env)
+            from: EMAIL_USER,
             to: 'email_para_receber_fichas@dominio.com', // <<--- Mude para o e-mail de destino real!
-            subject: `Nova Ficha Cadastral: ${formData.nome} - ${formData.cpf}`, // Assunto do e-mail
-            html: emailBody, // Corpo do e-mail em HTML
-            attachments: attachments // Anexos
+            subject: `Nova Ficha Cadastral: ${formData.nome} - ${formData.cpf}`,
+            html: emailBody,
+            attachments: attachments
         };
 
-        // 5. Enviar o e-mail
         await transporter.sendMail(mailOptions);
         console.log('E-mail enviado com sucesso.');
 
-        // 6. Remover arquivos temporários (MUITO IMPORTANTE para não acumular arquivos no servidor)
-        // Isso deve ser feito APÓS o envio do e-mail.
         attachments.forEach(attachment => {
             fs.unlink(attachment.path, (err) => {
                 if (err) console.error(`Erro ao remover arquivo temporário ${attachment.filename}:`, err);
             });
         });
 
-        // 7. Envia uma resposta de sucesso para o frontend
-        res.status(200).send('Formulário enviado e dados armazenados com sucesso!');
+        // --- ALTERAÇÃO AQUI: Redirecionar para a página de sucesso ---
+        res.redirect('/success.html'); // Redireciona para a página de sucesso após processamento
 
     } catch (error) {
         console.error('Erro no processamento do formulário:', error);
-        // Trata o erro de CPF duplicado (código 11000 é para duplicidade de índice único no MongoDB)
         if (error.code === 11000) {
+             // Redireciona ou renderiza uma página de erro específica para CPF duplicado
              return res.status(409).send('Erro: O CPF informado já possui uma ficha cadastral. Por favor, verifique ou entre em contato.');
         }
-        // Para outros erros, envia uma mensagem genérica
+        // Para outros erros, envia uma mensagem de erro genérica ou redireciona para uma página de erro
         res.status(500).send('Erro interno do servidor ao processar sua solicitação. Tente novamente mais tarde.');
     }
 });
 
 // --- Iniciar o Servidor ---
-// Faz o servidor "ouvir" requisições na porta especificada
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
