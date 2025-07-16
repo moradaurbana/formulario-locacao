@@ -1,4 +1,4 @@
-<!DOCTYPE html>     
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -33,7 +33,7 @@
             margin: 0 auto 2.5rem auto; /* Centraliza horizontalmente e adiciona margem inferior */
             max-width: 200px; /* Ajuste conforme o tamanho do seu logo */
             height: auto;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1)); /* Sombra sutil para destaque */
+            filter: drop_shadow(0 4px 8px rgba(0, 0, 0, 0.1)); /* Sombra sutil para destaque */
         }
 
         .form-header { text-align: center; margin-bottom: 2.5rem; }
@@ -58,9 +58,37 @@
         .file-upload-wrapper { border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; transition: all 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; }
         .file-upload-wrapper:hover { border-color: var(--secondary-color); box-shadow: 0 2px 8px rgba(0, 168, 232, 0.15); }
         .file-upload-input { display: none; }
-        .file-upload-label { display: flex; align-items: center; justify-content: space-between; width: 100%; cursor: pointer; }
-        .file-upload-label span { font-weight: 500; color: #555; }
-        .file-upload-button { background-color: #e9ecef; color: var(--primary-color); padding: 0.5rem 1rem; border-radius: 5px; font-weight: 500; font-size: 0.9rem; transition: background-color 0.3s; }
+        .file-upload-label {
+            display: flex;
+            align-items: center; /* Alinha verticalmente os itens no centro */
+            justify-content: space-between;
+            width: 100%;
+            cursor: pointer;
+            flex-wrap: wrap; /* Permite que os itens quebrem linha se não houver espaço */
+        }
+        .file-upload-label span {
+            font-weight: 500;
+            color: #555;
+            flex-grow: 1; /* Permite que o span ocupe o máximo de espaço possível */
+        }
+        /* Style for the new small tag message */
+        .file-upload-label small {
+            font-size: 0.75rem; /* Smaller font size */
+            color: #888; /* Lighter color */
+            margin-left: 5px; /* Adjust spacing as needed */
+            margin-right: 5px; /* Adjust spacing as needed */
+            white-space: nowrap; /* Previne quebra de linha para "Obrigatório" */
+        }
+        .file-upload-button {
+            background-color: #e9ecef;
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+            flex-shrink: 0; /* Previne que o botão encolha */
+        }
         .file-upload-label:hover .file-upload-button { background-color: var(--secondary-color); color: var(--white-color); }
         .file-name { margin-top: 0.75rem; font-size: 0.85rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .conjuge-field { display: none; }
@@ -83,7 +111,7 @@
 <body>
 
     <main class="form-container">
-        <img src="logo2024.png" alt="Logo da Empresa" class="top-logo">
+        <img src="C:\Projeto\form-backend\logo2024.png" alt="Logo da Empresa" class="top-logo">
 
         <header class="form-header">
             <h1>Ficha Cadastral para Locação</h1>
@@ -146,16 +174,96 @@
                 <h2>4. Documentos Necessários para Análise</h2>
                 <p style="margin-bottom: 1.5rem; color: #666;">Clique para escolher os arquivos (PDF, JPG, PNG).</p>
                 <div class="document-grid">
-                    <div class="file-upload-wrapper"> <label for="doc-rg-locatario" class="file-upload-label"> <span>RG do Locatário(a)</span> <strong class="file-upload-button">Escolher Arquivo</strong> </label> <input type="file" id="doc-rg-locatario" name="doc-rg-locatario" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" required> <span class="file-name">Nenhum arquivo selecionado</span> </div>
-                    <div class="file-upload-wrapper"> <label for="doc-cpf-locatario" class="file-upload-label"> <span>CPF do Locatário(a)</span> <strong class="file-upload-button">Escolher Arquivo</strong> </label> <input type="file" id="doc-cpf-locatario" name="doc-cpf-locatario" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" required> <span class="file-name">Nenhum arquivo selecionado</span> </div>
-                    <div class="file-upload-wrapper"> <label for="doc-comp-renda-locatario" class="file-upload-label"> <span>Comprovante de Renda Locatário(a)</span> <strong class="file-upload-button">Escolher Arquivo</strong> </label> <input type="file" id="doc-comp-renda-locatario" name="doc-comp-renda-locatario" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" required> <span class="file-name">Nenhum arquivo selecionado</span> </div>
-                    <div class="file-upload-wrapper"> <label for="doc-ir-locatario" class="file-upload-label"> <span>Declaração de IR Locatário(a)</span> <strong class="file-upload-button">Escolher Arquivo</strong> </label> <input type="file" id="doc-ir-locatario" name="doc-ir-locatario" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" required> <span class="file-name">Nenhum arquivo selecionado</span> </div>
-                    <div class="file-upload-wrapper"> <label for="doc-extrato" class="file-upload-label"> <span>Extrato bancário (últimos 90 dias)</span> <strong class="file-upload-button">Escolher Arquivo</strong> </label> <input type="file" id="doc-extrato" name="doc-extrato" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" required> <span class="file-name">Nenhum arquivo selecionado</span> </div>
-                    <div class="file-upload-wrapper"> <label for="doc-comp-residencia" class="file-upload-label"> <span>Comprovante de residência atual</span> <strong class="file-upload-button">Escolher Arquivo</strong> </label> <input type="file" id="doc-comp-residencia" name="doc-comp-residencia" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" required> <span class="file-name">Nenhum arquivo selecionado</span> </div>
-                    <div class="file-upload-wrapper conjuge-field"> <label for="doc-rg-conjuge" class="file-upload-label"> <span>RG do Cônjuge</span> <strong class="file-upload-button">Escolher Arquivo</strong> </label> <input type="file" id="doc-rg-conjuge" name="doc-rg-conjuge" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png"> <span class="file-name">Nenhum arquivo selecionado</span> </div>
-                    <div class="file-upload-wrapper conjuge-field"> <label for="doc-cpf-conjuge" class="file-upload-label"> <span>CPF do Cônjuge</span> <strong class="file-upload-button">Escolher Arquivo</strong> </label> <input type="file" id="doc-cpf-conjuge" name="doc-cpf-conjuge" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png"> <span class="file-name">Nenhum arquivo selecionado</span> </div>
-                    <div class="file-upload-wrapper conjuge-field"> <label for="doc-comp-renda-conjuge" class="file-upload-label"> <span>Comprovante de Renda Cônjuge</span> <strong class="file-upload-button">Escolher Arquivo</strong> </label> <input type="file" id="doc-comp-renda-conjuge" name="doc-comp-renda-conjuge" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png"> <span class="file-name">Nenhum arquivo selecionado</span> </div>
-                    <div class="file-upload-wrapper conjuge-field"> <label for="doc-ir-conjuge" class="file-upload-label"> <span>Declaração de IR Cônjuge</span> <strong class="file-upload-button">Escolher Arquivo</strong> </label> <input type="file" id="doc-ir-conjuge" name="doc-ir-conjuge" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png"> <span class="file-name">Nenhum arquivo selecionado</span> </div>
+                    <div class="file-upload-wrapper">
+                        <label for="doc-rg-locatario" class="file-upload-label">
+                            <span>RG do Locatário(a)</span>
+                            <small>(Obrigatório)</small>
+                            <strong class="file-upload-button">Escolher Arquivo</strong>
+                        </label>
+                        <input type="file" id="doc-rg-locatario" name="doc-rg-locatario" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <span class="file-name">Nenhum arquivo selecionado</span>
+                    </div>
+                    <div class="file-upload-wrapper">
+                        <label for="doc-cpf-locatario" class="file-upload-label">
+                            <span>CPF do Locatário(a)</span>
+                            <small>(Obrigatório)</small>
+                            <strong class="file-upload-button">Escolher Arquivo</strong>
+                        </label>
+                        <input type="file" id="doc-cpf-locatario" name="doc-cpf-locatario" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <span class="file-name">Nenhum arquivo selecionado</span>
+                    </div>
+                    <div class="file-upload-wrapper">
+                        <label for="doc-comp-renda-locatario" class="file-upload-label">
+                            <span>Comprovante de Renda Locatário(a)</span>
+                            <small>(Obrigatório)</small>
+                            <strong class="file-upload-button">Escolher Arquivo</strong>
+                        </label>
+                        <input type="file" id="doc-comp-renda-locatario" name="doc-comp-renda-locatario" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <span class="file-name">Nenhum arquivo selecionado</span>
+                    </div>
+                    <div class="file-upload-wrapper">
+                        <label for="doc-ir-locatario" class="file-upload-label">
+                            <span>Declaração de IR Locatário(a)</span>
+                            <small>(Obrigatório)</small>
+                            <strong class="file-upload-button">Escolher Arquivo</strong>
+                        </label>
+                        <input type="file" id="doc-ir-locatario" name="doc-ir-locatario" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <span class="file-name">Nenhum arquivo selecionado</span>
+                    </div>
+                    <div class="file-upload-wrapper">
+                        <label for="doc-extrato" class="file-upload-label">
+                            <span>Extrato bancário (últimos 90 dias)</span>
+                            <small>(Obrigatório)</small>
+                            <strong class="file-upload-button">Escolher Arquivo</strong>
+                        </label>
+                        <input type="file" id="doc-extrato" name="doc-extrato" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <span class="file-name">Nenhum arquivo selecionado</span>
+                    </div>
+                    <div class="file-upload-wrapper">
+                        <label for="doc-comp-residencia" class="file-upload-label">
+                            <span>Comprovante de residência atual</span>
+                            <small>(Obrigatório)</small>
+                            <strong class="file-upload-button">Escolher Arquivo</strong>
+                        </label>
+                        <input type="file" id="doc-comp-residencia" name="doc-comp-residencia" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <span class="file-name">Nenhum arquivo selecionado</span>
+                    </div>
+                    <div class="file-upload-wrapper conjuge-field">
+                        <label for="doc-rg-conjuge" class="file-upload-label">
+                            <span>RG do Cônjuge</span>
+                            <small>(Obrigatório)</small>
+                            <strong class="file-upload-button">Escolher Arquivo</strong>
+                        </label>
+                        <input type="file" id="doc-rg-conjuge" name="doc-rg-conjuge" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png">
+                        <span class="file-name">Nenhum arquivo selecionado</span>
+                    </div>
+                    <div class="file-upload-wrapper conjuge-field">
+                        <label for="doc-cpf-conjuge" class="file-upload-label">
+                            <span>CPF do Cônjuge</span>
+                            <small>(Obrigatório)</small>
+                            <strong class="file-upload-button">Escolher Arquivo</strong>
+                        </label>
+                        <input type="file" id="doc-cpf-conjuge" name="doc-cpf-conjuge" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png">
+                        <span class="file-name">Nenhum arquivo selecionado</span>
+                    </div>
+                    <div class="file-upload-wrapper conjuge-field">
+                        <label for="doc-comp-renda-conjuge" class="file-upload-label">
+                            <span>Comprovante de Renda Cônjuge</span>
+                            <small>(Obrigatório)</small>
+                            <strong class="file-upload-button">Escolher Arquivo</strong>
+                        </label>
+                        <input type="file" id="doc-comp-renda-conjuge" name="doc-comp-renda-conjuge" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png">
+                        <span class="file-name">Nenhum arquivo selecionado</span>
+                    </div>
+                    <div class="file-upload-wrapper conjuge-field">
+                        <label for="doc-ir-conjuge" class="file-upload-label">
+                            <span>Declaração de IR Cônjuge</span>
+                            <small>(Obrigatório)</small>
+                            <strong class="file-upload-button">Escolher Arquivo</strong>
+                        </label>
+                        <input type="file" id="doc-ir-conjuge" name="doc-ir-conjuge" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png">
+                        <span class="file-name">Nenhum arquivo selecionado</span>
+                    </div>
                 </div>
             </section>
 
