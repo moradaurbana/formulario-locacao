@@ -519,6 +519,22 @@ function atualizarDocumentos() {
         div.innerHTML = `<label class="required">${doc}:</label><input type="file" name="${fieldName}">`; // Anexos não obrigatórios
         documentosContainer.appendChild(div);
     });
+
+  // Desabilita campos obrigatórios das seções ocultas
+  document.querySelectorAll('section.hidden input, section.hidden select, section.hidden textarea').forEach(field => {
+    if (!field.dataset.originalRequired) {
+      field.dataset.originalRequired = field.hasAttribute('required') ? "true" : "false";
+    }
+    field.removeAttribute('required');
+  });
+
+  // Reativa campos obrigatórios das seções visíveis
+  document.querySelectorAll('section:not(.hidden) input, section:not(.hidden) select, section:not(.hidden) textarea').forEach(field => {
+    if (field.dataset.originalRequired === "true") {
+      field.setAttribute('required', 'true');
+    }
+  });
+
 }
 
 // --- Funções de Validação Global ---
@@ -675,7 +691,7 @@ document.getElementById('form-cadastro').addEventListener('submit', async functi
     const form = event.target;
     const formData = new FormData(form);
 
-    const backendUrl = 'https://formulario-locacao-app.herokuapp.com'; // Lembre-se de substituir pela URL do seu backend.
+    const backendUrl = 'https://formulario-locacao-app.herokuapp.com'; // Lembre-se de substituir pela URL do seu backend
 
     try {
         const response = await fetch(backendUrl, {
