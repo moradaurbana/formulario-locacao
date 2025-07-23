@@ -675,7 +675,7 @@ document.getElementById('form-cadastro').addEventListener('submit', async functi
     const form = event.target;
     const formData = new FormData(form);
 
-    const backendUrl = 'https://SUA-APLICACAO-HEROKU.herokuapp.com/submit-form'; // Lembre-se de substituir pela URL do seu backend
+    const backendUrl = 'https://formulario-locacao-app.herokuapp.com'; // Lembre-se de substituir pela URL do seu backend
 
     try {
         const response = await fetch(backendUrl, {
