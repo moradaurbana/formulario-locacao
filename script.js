@@ -516,7 +516,7 @@ function atualizarDocumentos() {
         const div = document.createElement("div");
         div.classList.add("input-group");
         const fieldName = doc.toLowerCase().normalize('NFD').replace(/[^\w\s]/g, '').replace(/\s+/g, '_');
-        div.innerHTML = `<label class="required">${doc}:</label><input type="file" name="${fieldName}">`; // Anexos não obrigatórios
+        div.innerHTML = `<label class="required">${doc}:</label><input type="file" name="${fieldName}" required>`; // Anexos não obrigatórios
         documentosContainer.appendChild(div);
     });
 }
@@ -540,10 +540,7 @@ function validateForm() {
         const isVisible = !parentSection || !parentSection.classList.contains('hidden');
 
         if (isVisible) {
-            if (input.type === 'file') {
-                // Campos de arquivo não são obrigatórios por design (já ajustado)
-                // Não adicionamos borda vermelha nem mensagem genérica para files vazios
-            } else if (!input.value.trim()) {
+           if (!input.value.trim()) {
                 isValid = false;
                 input.classList.add('error-border');
                 // Adiciona mensagem de "Campo obrigatório" apenas se não houver outra mensagem de erro específica
