@@ -317,13 +317,62 @@
             <label for="nacionalidade">Nacionalidade:</label>
             <select id="nacionalidade" name="nacionalidade">
               <option value="">Selecione...</option>
-              <option value="brasileiro">Brasileiro(a)</option>
-              <option value="estrangeiro">Estrangeiro(a)</option>
+              <option value="brasileira">Brasileira</option>
+              <option value="estrangeira">Estrangeira</option>
+              <option value="dupla">Dupla nacionalidade</option>
+              <option value="outra">Outra</option>
             </select>
           </div>
-          <div class="input-group">
-            <label for="naturalidade">Naturalidade:</label>
-            <input type="text" id="naturalidade" name="naturalidade" />
+
+          <div id="nacionalidade-brasileira-group" class="form-grid hidden">
+            <div class="input-group">
+              <label for="uf_nascimento">Estado de Nascimento (UF):</label>
+              <select id="uf_nascimento" name="uf_nascimento">
+                <option value="">Selecione...</option>
+                <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option><option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option><option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option><option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option><option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option><option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option><option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option><option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option><option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="cidade_nascimento">Cidade de Nascimento:</label>
+              <input type="text" id="cidade_nascimento" name="cidade_nascimento" />
+            </div>
+          </div>
+
+          <div id="nacionalidade-estrangeira-group" class="form-grid hidden">
+            <div class="input-group">
+              <label for="pais_nascimento">País de Nascimento:</label>
+              <input type="text" id="pais_nascimento" name="pais_nascimento" />
+            </div>
+            <div class="input-group">
+              <label for="cidade_origem">Cidade no País de Origem (Opcional):</label>
+              <input type="text" id="cidade_origem" name="cidade_origem" />
+            </div>
+          </div>
+
+          <div id="nacionalidade-dupla-group" class="form-grid hidden">
+            <div class="input-group">
+              <label for="pais_principal">País Principal de Nascimento:</label>
+              <input type="text" id="pais_principal" name="pais_principal" />
+            </div>
+            <div class="input-group">
+              <label for="cidade_principal">Cidade Principal de Nascimento:</label>
+              <input type="text" id="cidade_principal" name="cidade_principal" />
+            </div>
+            <div class="input-group">
+              <label for="segundo_pais">Segundo País (Opcional):</label>
+              <input type="text" id="segundo_pais" name="segundo_pais" />
+            </div>
+            <div class="input-group">
+              <label for="segunda_cidade">Segunda Cidade (Opcional):</label>
+              <input type="text" id="segunda_cidade" name="segunda_cidade" />
+            </div>
+          </div>
+
+          <div id="nacionalidade-outra-group" class="form-grid hidden">
+            <div class="input-group">
+              <label for="naturalidade_texto_livre">Informe sua naturalidade:</label>
+              <input type="text" id="naturalidade_texto_livre" name="naturalidade_texto_livre" />
+            </div>
           </div>
           <div class="input-group">
             <label for="celular" class="required">Celular (WhatsApp):</label>
@@ -535,15 +584,13 @@
       <section>
         <h2>Documentos para Anexo</h2>
         <div class="form-grid" id="documentos-container">
-          <!-- Documentos serão inseridos aqui dinamicamente pelo script.js -->
-        </div>
+          </div>
       </section>
 
       <button type="submit">Enviar Ficha Cadastral</button>
     </form>
   </main>
 
-  <!-- Overlay de Carregamento -->
   <div class="loading-overlay" id="loading-overlay">
     <div class="loading-spinner"></div>
     <p class="loading-message">O envio está sendo processado...</p>
