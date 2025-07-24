@@ -7,13 +7,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
+      /* Cores baseadas em moradaurbana.com.br */
       --primary-color: #005A8D; /* Azul escuro principal */
-      --success-color: #28a745; /* Verde para sucesso */
+      --secondary-color: #007BFF; /* Azul mais claro para ênfase (títulos de seção) */
+      --accent-color: #28a745; /* Verde para sucesso (mantido para feedback positivo) */
       --text-color: #333;
-      --light-text-color: #666;
+      --light-text-color: #555;
       --background-color: #f8f8f8;
       --container-bg: #fff;
-      --shadow-medium: rgba(0, 0, 0, 0.1);
+      --border-color: #e0e0e0;
+      --shadow-light: rgba(0, 0, 0, 0.04);
+      --shadow-medium: rgba(0, 0, 0, 0.08);
+      --error-color: #dc3545;
     }
 
     body {
@@ -36,23 +41,25 @@
       background: var(--container-bg);
       padding: 3rem 2rem;
       border-radius: 12px;
-      box-shadow: 0 8px 25px var(--shadow-medium);
-      border: 1px solid #eee;
+      box-shadow: 0 4px 15px var(--shadow-medium); /* Sombra mais suave */
+      border: 1px solid var(--border-color); /* Borda mais sutil */
     }
 
     .header-logo {
       margin-bottom: 2rem;
       padding-bottom: 1.5rem;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid var(--border-color); /* Borda sutil */
     }
 
     .header-logo img {
       max-width: 150px;
       height: auto;
+      border-radius: 8px; /* Bordas arredondadas para o logo */
+      box-shadow: 0 2px 8px var(--shadow-light); /* Sombra leve no logo */
     }
 
     h1 {
-      color: var(--success-color);
+      color: var(--primary-color); /* Título principal com cor primária */
       font-size: 2.5rem;
       margin-bottom: 1rem;
       font-weight: 700;
