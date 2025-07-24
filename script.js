@@ -20,6 +20,16 @@ const informacoesFiadorSection = document.getElementById("informacoes-fiador-sec
 const enderecoFiadorSection = document.getElementById("endereco-fiador-section");
 const dadosProfissionaisFiadorSection = document.getElementById("dados-profissionais-fiador-section");
 
+// IDs dos campos que NÃO são obrigatórios (para validação)
+const optionalFieldIds = [
+    'complemento-residencial',
+    'complemento-profissional',
+    'fiador-complemento-residencial',
+    'fiador-complemento-profissional',
+    'nacionalidade', // Continua aqui
+    'naturalidade'
+];
+
 // --- Funções de Utilitário ---
 
 // Limpa os campos de endereço
@@ -89,7 +99,7 @@ async function consultarCep(inputElement, type) {
                 if (logradouroInput) logradouroInput.value = data.street;
                 if (bairroInput) bairroInput.value = data.neighborhood;
                 if (cidadeInput) cidadeInput.value = data.city;
-                if (estadoInput) inputElement.value = data.state; // Corrigido para inputElement
+                if (estadoInput) estadoInput.value = data.state;
                 if (cepErrorSpan) cepErrorSpan.textContent = "";
                 return; // Sai se Brasil API for bem-sucedido
             } else {
@@ -534,16 +544,6 @@ function validateForm() {
         documentosContainer // Para os inputs de arquivo
     ];
 
-    // IDs dos campos que NÃO são obrigatórios
-    const optionalFieldIds = [
-        'complemento-residencial',
-        'complemento-profissional',
-        'fiador-complemento-residencial',
-        'fiador-complemento-profissional',
-        'nacionalidade',
-        'naturalidade'
-    ];
-
     dynamicSections.forEach(section => {
         // Apenas processa se a seção não estiver oculta
         if (!section.classList.contains('hidden')) {
@@ -604,36 +604,26 @@ function validateForm() {
     return isValid;
 }
 
-// NOVO: Função para limpar todos os campos do formulário
+// Função para limpar todos os campos do formulário
 function clearFormFields() {
     formCadastro.querySelectorAll('input, select, textarea').forEach(input => {
-        // Resetar o valor do input
         if (input.type === 'file') {
-            // Para inputs de arquivo, o valor não pode ser definido diretamente por segurança
-            // A melhor forma é resetar o formulário ou criar um novo input de arquivo,
-            // mas para este caso, podemos ignorar ou limpar visualmente se possível.
-            // Para uma limpeza completa, seria necessário resetar o formulário inteiro ou
-            // remover e recriar os inputs de arquivo.
-            input.value = ''; // Tenta limpar, mas pode não funcionar em todos os browsers
+            input.value = '';
         } else if (input.type === 'checkbox' || input.type === 'radio') {
             input.checked = false;
         } else if (input.tagName === 'SELECT') {
-            input.selectedIndex = 0; // Seleciona a primeira opção (geralmente "Selecione...")
+            input.selectedIndex = 0;
         } else {
             input.value = '';
         }
 
-        // Remover bordas de erro
         input.classList.remove('error-border');
-
-        // Remover mensagens de erro
         const errorSpan = input.parentNode.querySelector('.error-message');
         if (errorSpan) {
             errorSpan.textContent = '';
         }
     });
 
-    // Resetar a visibilidade das seções para o estado inicial (escondidas)
     informacoesPessoaisSection.classList.add("hidden");
     enderecoResidencialSection.classList.add("hidden");
     dadosProfissionaisSection.classList.add("hidden");
@@ -641,8 +631,7 @@ function clearFormFields() {
     enderecoFiadorSection.classList.add("hidden");
     dadosProfissionaisFiadorSection.classList.add("hidden");
 
-    // Re-executar atualizarDocumentos para redefinir os campos de anexo (já que são dinâmicos)
-    atualizarDocumentos();
+    atualizarDocumentos(); // Re-executa para redefinir os campos de anexo
 }
 
 
@@ -725,9 +714,7 @@ formCadastro.addEventListener('submit', async function(event) {
 
         if (response.ok) {
             const result = await response.json();
-            // NOVO: Limpa o formulário antes de redirecionar
             clearFormFields(); 
-            // Esconde o overlay antes de redirecionar
             hideLoadingOverlay();
             window.location.href = 'sucesso.html'; 
         } else {

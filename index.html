@@ -314,11 +314,15 @@
             <input type="date" id="data-nascimento" name="data-nascimento" />
           </div>
           <div class="input-group">
-            <label for="nacionalidade">Nacionalidade:</label> <!-- Não mais obrigatório -->
-            <input type="text" id="nacionalidade" name="nacionalidade" />
+            <label for="nacionalidade">Nacionalidade:</label>
+            <select id="nacionalidade" name="nacionalidade">
+              <option value="">Selecione...</option>
+              <option value="brasileiro">Brasileiro(a)</option>
+              <option value="estrangeiro">Estrangeiro(a)</option>
+            </select>
           </div>
           <div class="input-group">
-            <label for="naturalidade">Naturalidade:</label> <!-- Não mais obrigatório -->
+            <label for="naturalidade">Naturalidade:</label>
             <input type="text" id="naturalidade" name="naturalidade" />
           </div>
           <div class="input-group">
@@ -351,7 +355,7 @@
             <input type="text" id="numero-residencial" name="numero-residencial" />
           </div>
           <div class="input-group">
-            <label for="complemento-residencial">Complemento:</label> <!-- Não mais obrigatório -->
+            <label for="complemento-residencial">Complemento:</label>
             <input type="text" id="complemento-residencial" name="complemento-residencial" />
           </div>
           <div class="input-group">
@@ -398,7 +402,7 @@
             <input type="text" id="numero-profissional" name="numero-profissional" />
           </div>
           <div class="input-group">
-            <label for="complemento-profissional">Complemento Profissional:</label> <!-- Não mais obrigatório -->
+            <label for="complemento-profissional">Complemento Profissional:</label>
             <input type="text" id="complemento-profissional" name="complemento-profissional" />
           </div>
           <div class="input-group">
@@ -467,7 +471,7 @@
             <input type="text" id="numero-fiador-residencial" name="fiador-numero-residencial" />
           </div>
           <div class="input-group">
-            <label for="complemento-fiador-residencial">Complemento do Fiador:</label> <!-- Não mais obrigatório -->
+            <label for="complemento-fiador-residencial">Complemento do Fiador:</label>
             <input type="text" id="complemento-fiador-residencial" name="fiador-complemento-residencial" />
           </div>
           <div class="input-group">
@@ -510,7 +514,7 @@
             <input type="text" id="fiador-numero-profissional" name="fiador-numero-profissional" />
           </div>
           <div class="input-group">
-            <label for="complemento-profissional">Complemento Profissional do Fiador:</label> <!-- Não mais obrigatório -->
+            <label for="complemento-profissional">Complemento Profissional do Fiador:</label>
             <input type="text" id="fiador-complemento-profissional" name="fiador-complemento-profissional" />
           </div>
           <div class="input-group">
@@ -531,6 +535,7 @@
       <section>
         <h2>Documentos para Anexo</h2>
         <div class="form-grid" id="documentos-container">
+          <!-- Documentos serão inseridos aqui dinamicamente pelo script.js -->
         </div>
       </section>
 
