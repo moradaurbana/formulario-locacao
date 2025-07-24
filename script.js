@@ -9,7 +9,6 @@ const tipoLocacao = document.getElementById("tipo-locacao");
 const garantia = document.getElementById("garantia");
 const documentosContainer = document.getElementById("documentos-container");
 const loadingOverlay = document.getElementById('loading-overlay'); // Elemento do overlay de carregamento
-const progressBar = document.getElementById('progress-bar'); // Novo: Elemento da barra de progresso
 
 // Seções principais do locatário (também sempre existem, mas podem ser hidden/shown)
 const informacoesPessoaisSection = document.getElementById("informacoes-pessoais-section");
@@ -20,16 +19,6 @@ const dadosProfissionaisSection = document.getElementById("dados-profissionais-s
 const informacoesFiadorSection = document.getElementById("informacoes-fiador-section");
 const enderecoFiadorSection = document.getElementById("endereco-fiador-section");
 const dadosProfissionaisFiadorSection = document.getElementById("dados-profissionais-fiador-section");
-
-// IDs dos campos que NÃO são obrigatórios (para validação)
-const optionalFieldIds = [
-    'complemento-residencial',
-    'complemento-profissional',
-    'fiador-complemento-residencial',
-    'fiador-complemento-profissional',
-    'nacionalidade',
-    'naturalidade'
-];
 
 // --- Funções de Utilitário ---
 
@@ -55,23 +44,26 @@ async function consultarCep(inputElement, type) {
     const cleanCep = cep.replace(/\D/g, '');
 
     if (cleanCep.length !== 8) {
+        // Limpa e sai se o CEP não tem 8 dígitos
         clearAddressFields(type);
-        updateProgressBar(); // Atualiza o progresso ao limpar
         return;
     }
 
+    // Busca os elementos de endereço e erro dinamicamente
     const logradouroInput = document.getElementById("logradouro-" + type);
     const bairroInput = document.getElementById("bairro-" + type);
     const cidadeInput = document.getElementById("cidade-" + type);
     const estadoInput = document.getElementById("estado-" + type);
     const cepErrorSpan = document.getElementById("cep-" + type + "-error");
 
+    // Pre-limpa os campos e erros antes da consulta para evitar dados antigos
     if (logradouroInput) logradouroInput.value = "";
     if (bairroInput) bairroInput.value = "";
     if (cidadeInput) cidadeInput.value = "";
     if (estadoInput) estadoInput.value = "";
     if (cepErrorSpan) cepErrorSpan.textContent = "Buscando...";
     if (inputElement) inputElement.classList.remove('error-border');
+
 
     try {
         const viaCepResponse = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
@@ -83,8 +75,7 @@ async function consultarCep(inputElement, type) {
             if (cidadeInput) cidadeInput.value = data.localidade;
             if (estadoInput) estadoInput.value = data.uf;
             if (cepErrorSpan) cepErrorSpan.textContent = "";
-            updateProgressBar(); // Atualiza o progresso após sucesso
-            return;
+            return; // Sai se ViaCEP for bem-sucedido
         } else {
             throw new Error("ViaCEP falhou ou CEP não encontrado.");
         }
@@ -98,10 +89,9 @@ async function consultarCep(inputElement, type) {
                 if (logradouroInput) logradouroInput.value = data.street;
                 if (bairroInput) bairroInput.value = data.neighborhood;
                 if (cidadeInput) cidadeInput.value = data.city;
-                if (estadoInput) estadoInput.value = data.state;
+                if (estadoInput) inputElement.value = data.state; // Corrigido para inputElement
                 if (cepErrorSpan) cepErrorSpan.textContent = "";
-                updateProgressBar(); // Atualiza o progresso após sucesso
-                return;
+                return; // Sai se Brasil API for bem-sucedido
             } else {
                 throw new Error("Brasil API também falhou ou CEP não encontrado.");
             }
@@ -109,8 +99,7 @@ async function consultarCep(inputElement, type) {
             console.error("Erro ao consultar CEP em ambas as APIs:", brasilApiError.message);
             if (cepErrorSpan) cepErrorSpan.textContent = "CEP inválido ou não encontrado.";
             if (inputElement) inputElement.classList.add('error-border');
-            clearAddressFields(type);
-            updateProgressBar(); // Atualiza o progresso após erro
+            clearAddressFields(type); // Limpa os campos em caso de erro
         }
     }
 }
@@ -158,10 +147,10 @@ function validateCPF(cpf) {
 
 function handleCpfInput(inputElement) {
     formatCPFInput(inputElement);
-    const errorElement = inputElement.parentNode.querySelector('.error-message');
+    const errorElement = inputElement.parentNode.querySelector('.error-message'); // Busca o erro dinamicamente
     const cleanedCpf = inputElement.value.replace(/\D/g, '');
 
-    if (errorElement) {
+    if (errorElement) { // Garante que o span de erro existe
         if (cleanedCpf.length === 11) {
             if (validateCPF(cleanedCpf)) {
                 errorElement.textContent = "";
@@ -178,7 +167,6 @@ function handleCpfInput(inputElement) {
             inputElement.classList.remove('error-border');
         }
     }
-    updateProgressBar(); // Atualiza o progresso
 }
 
 // Formata RG (00.000.000-0)
@@ -193,10 +181,10 @@ function handleRgInput(inputElement) {
     }
     inputElement.value = value;
 
-    const errorElement = inputElement.parentNode.querySelector('.error-message');
+    const errorElement = inputElement.parentNode.querySelector('.error-message'); // Busca o erro dinamicamente
     const cleanedRg = inputElement.value.replace(/\D/g, '');
 
-    if (errorElement) {
+    if (errorElement) { // Garante que o span de erro existe
         if (cleanedRg.length > 0 && cleanedRg.length < 7) {
             errorElement.textContent = "RG incompleto";
             inputElement.classList.add('error-border');
@@ -205,7 +193,6 @@ function handleRgInput(inputElement) {
             inputElement.classList.remove('error-border');
         }
     }
-    updateProgressBar(); // Atualiza o progresso
 }
 
 // Formata Telefone ((99) 99999-9999)
@@ -229,10 +216,10 @@ function validatePhone(phoneNumber) {
 }
 
 function handlePhoneInput(inputElement) {
-    formatPhoneInput(inputElement);
-    const errorElement = inputElement.parentNode.querySelector('.error-message');
+    formatPhoneInput(inputElement); // Aplica a formatação
+    const errorElement = inputElement.parentNode.querySelector('.error-message'); // Busca o erro dinamicamente
 
-    if (errorElement) {
+    if (errorElement) { // Garante que o span de erro existe
         if (inputElement.value.length > 0 && !validatePhone(inputElement.value)) {
             errorElement.textContent = "Número de celular inválido";
             inputElement.classList.add('error-border');
@@ -241,7 +228,6 @@ function handlePhoneInput(inputElement) {
             inputElement.classList.remove('error-border');
         }
     }
-    updateProgressBar(); // Atualiza o progresso
 }
 
 // Valida formato de e-mail
@@ -251,9 +237,9 @@ function validateEmail(email) {
 }
 
 function handleEmailInput(inputElement) {
-    const errorElement = inputElement.parentNode.querySelector('.error-message');
+    const errorElement = inputElement.parentNode.querySelector('.error-message'); // Busca o erro dinamicamente
 
-    if (errorElement) {
+    if (errorElement) { // Garante que o span de erro existe
         if (inputElement.value.length > 0 && !validateEmail(inputElement.value)) {
             errorElement.textContent = "Formato de e-mail inválido";
             inputElement.classList.add('error-border');
@@ -262,34 +248,35 @@ function handleEmailInput(inputElement) {
             inputElement.classList.remove('error-border');
         }
     }
-    updateProgressBar(); // Atualiza o progresso
 }
 
 // Formata valores monetários (R$ 0.000,00) com máscara automática e casas decimais dinâmicas
 function formatCurrencyInput(inputElement) {
-    let value = inputElement.value.replace(/\D/g, '');
+    let value = inputElement.value.replace(/\D/g, ''); // Remove todos os não-dígitos
 
     if (value === '') {
-        inputElement.value = '';
+        inputElement.value = ''; // Limpa o campo se não houver dígitos
         inputElement.classList.remove('error-border');
-        updateProgressBar(); // Atualiza o progresso
         return;
     }
 
+    // Garante que o valor tenha pelo menos 2 dígitos para as casas decimais (Ex: "5" vira "05")
     while (value.length < 2) {
         value = '0' + value;
     }
 
+    // Adiciona o ponto decimal antes dos últimos dois dígitos para representar os centavos
+    // Ex: "12345" vira "123.45", "05" vira "0.05"
     let numberValue = parseFloat(value.slice(0, -2) + '.' + value.slice(-2));
 
+    // Formata o número como moeda brasileira
     inputElement.value = numberValue.toLocaleString('pt-BR', {
         style: 'currency',
         currency: 'BRL',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        minimumFractionDigits: 2, // Garante sempre duas casas decimais
+        maximumFractionDigits: 2  // Impede mais de duas casas decimais
     });
-    inputElement.classList.remove('error-border');
-    updateProgressBar(); // Atualiza o progresso
+    inputElement.classList.remove('error-border'); // Remove a borda de erro se o valor for válido
 }
 
 // --- Lógica de Exibição Dinâmica das Seções e Documentos ---
@@ -297,9 +284,11 @@ function formatCurrencyInput(inputElement) {
 // Nova função para habilitar/desabilitar inputs em uma seção
 function toggleSectionInputs(section, enable) {
     section.querySelectorAll('input, select, textarea').forEach(input => {
+        // Exclui os selects da seleção inicial, pois eles controlam a lógica de exibição
         if (input.id !== 'tipo-locacao' && input.id !== 'tipo-pessoa' && input.id !== 'tipo-atividade' && input.id !== 'estado-civil' && input.id !== 'garantia') {
             input.disabled = !enable;
             if (!enable) {
+                // Limpa o valor e o estado de erro quando o campo é desabilitado
                 input.value = '';
                 input.classList.remove('error-border');
                 const errorSpan = input.parentNode.querySelector('.error-message');
@@ -312,6 +301,7 @@ function toggleSectionInputs(section, enable) {
 }
 
 function resetPjLabels() {
+    // Labels do Locatário/Sócio/Representante
     document.querySelector('label[for="nome-completo"]').textContent = 'Nome Completo';
     document.querySelector('label[for="cpf"]').textContent = 'CPF';
     document.querySelector('label[for="rg"]').textContent = 'RG';
@@ -320,6 +310,7 @@ function resetPjLabels() {
     document.querySelector('label[for="email"]').textContent = 'Email';
     document.querySelector('label[for="cep-residencial"]').textContent = 'CEP';
 
+    // Labels da Empresa/Profissional (locatário)
     document.querySelector('label[for="nome-empresa"]').textContent = 'Nome da Empresa';
     document.querySelector('label[for="cargo"]').textContent = 'Cargo';
     document.querySelector('label[for="remuneracao-mensal"]').textContent = 'Remuneração Mensal';
@@ -331,6 +322,7 @@ function resetPjLabels() {
     document.querySelector('label[for="cidade-profissional"]').textContent = 'Cidade Profissional';
     document.querySelector('label[for="estado-profissional"]').textContent = 'Estado Profissional';
 
+    // Títulos das Seções
     informacoesPessoaisSection.querySelector('h2').textContent = 'Informações Pessoais';
     enderecoResidencialSection.querySelector('h2').textContent = 'Endereço Residencial';
     dadosProfissionaisSection.querySelector('h2').textContent = 'Dados Profissionais';
@@ -338,6 +330,7 @@ function resetPjLabels() {
 
 function atualizarDocumentos() {
     documentosContainer.innerHTML = "";
+    // Esconder todas as seções e desabilitar seus inputs inicialmente
     informacoesPessoaisSection.classList.add("hidden");
     toggleSectionInputs(informacoesPessoaisSection, false);
     enderecoResidencialSection.classList.add("hidden");
@@ -360,7 +353,6 @@ function atualizarDocumentos() {
 
     if (!filtrosPreenchidos) {
         resetPjLabels();
-        updateProgressBar(); // Atualiza o progresso
         return;
     }
 
@@ -384,7 +376,7 @@ function atualizarDocumentos() {
         toggleSectionInputs(dadosProfissionaisSection, true);
 
         if (isPessoaFisica) {
-            resetPjLabels();
+            resetPjLabels(); // Garante que labels de PJ não fiquem ativas
             if (isCLT) {
                 docs.push(
                     "RG do Locatário(a)",
@@ -430,6 +422,7 @@ function atualizarDocumentos() {
                 );
             }
         } else if (isPessoaJuridica) {
+            // Ajusta labels para PJ
             informacoesPessoaisSection.querySelector('h2').textContent = 'Informações do Sócio/Representante';
             enderecoResidencialSection.querySelector('h2').textContent = 'Endereço do Sócio/Representante';
             dadosProfissionaisSection.querySelector('h2').textContent = 'Dados Profissionais da Empresa';
@@ -464,7 +457,7 @@ function atualizarDocumentos() {
             );
         }
     } else {
-        resetPjLabels();
+        resetPjLabels(); // Garante que labels de PF/PJ estejam resetadas se as seções principais não são mostradas
     }
 
     if (garantiaFiador && showPrimaryApplicantSections) {
@@ -494,235 +487,153 @@ function atualizarDocumentos() {
         }
     }
 
-    // Adiciona os campos de upload de documentos com instruções
     docs.forEach(doc => {
         const div = document.createElement("div");
         div.classList.add("input-group");
         const fieldName = doc.toLowerCase().normalize('NFD').replace(/[^\w\s]/g, '').replace(/\s+/g, '_');
-        div.innerHTML = `
-            <label class="required">${doc}:</label>
-            <input type="file" name="${fieldName}">
-            <span class="file-instructions">Formatos: PDF, JPG, PNG. Tamanho máximo: 5MB.</span>
-            <span class="error-message"></span>
-        `;
+        // Removido o atributo 'required' dos inputs de arquivo
+        div.innerHTML = `<label class="required">${doc}:</label><input type="file" name="${fieldName}">`;
         documentosContainer.appendChild(div);
     });
-    updateProgressBar(); // Atualiza o progresso após a atualização dos documentos
 }
 
-// --- Funções de Validação Global e por Campo ---
-
-// Valida um único campo e atualiza o feedback visual
-function validateField(inputElement) {
-    let isValid = true;
-    const errorSpan = inputElement.parentNode.querySelector('.error-message');
-    
-    // Limpa mensagens de erro anteriores
-    if (errorSpan) errorSpan.textContent = '';
-    inputElement.classList.remove('error-border');
-
-    // Se o campo estiver desabilitado ou for somente leitura, não valida
-    if (inputElement.disabled || inputElement.readOnly) {
-        return true;
-    }
-
-    // Validação para campos de seleção inicial (sempre obrigatórios)
-    if (['tipo-locacao', 'tipo-pessoa', 'tipo-atividade', 'estado-civil', 'garantia'].includes(inputElement.id)) {
-        if (!inputElement.value.trim()) {
-            isValid = false;
-            if (errorSpan) errorSpan.textContent = 'Campo obrigatório.';
-            inputElement.classList.add('error-border');
-        }
-    } 
-    // Validação para outros campos obrigatórios (não opcionais)
-    else if (!optionalFieldIds.includes(inputElement.id)) {
-        // Verifica se o campo está visível (não dentro de uma seção hidden)
-        const parentSection = inputElement.closest('section');
-        const isVisible = !parentSection || !parentSection.classList.contains('hidden');
-
-        if (isVisible && inputElement.value.trim() === '') {
-            isValid = false;
-            if (errorSpan) errorSpan.textContent = 'Campo obrigatório.';
-            inputElement.classList.add('error-border');
-        }
-    }
-
-    // Validações específicas para formatos
-    switch (inputElement.id) {
-        case 'cpf':
-        case 'fiador-cpf':
-            // A validação de CPF já é tratada em handleCpfInput, que também define a mensagem de erro
-            // Se handleCpfInput já setou um erro, isValid será false
-            if (inputElement.value.length > 0 && !validateCPF(inputElement.value.replace(/\D/g, ''))) {
-                isValid = false;
-            }
-            break;
-        case 'rg':
-        case 'fiador-rg':
-            // A validação de RG já é tratada em handleRgInput
-            if (inputElement.value.length > 0 && inputElement.value.replace(/\D/g, '').length < 7) {
-                isValid = false;
-            }
-            break;
-        case 'celular':
-        case 'fiador-celular':
-            // A validação de telefone já é tratada em handlePhoneInput
-            if (inputElement.value.length > 0 && !validatePhone(inputElement.value)) {
-                isValid = false;
-            }
-            break;
-        case 'email':
-        case 'fiador-email':
-            // A validação de e-mail já é tratada em handleEmailInput
-            if (inputElement.value.length > 0 && !validateEmail(inputElement.value)) {
-                isValid = false;
-            }
-            break;
-        case 'cep-residencial':
-        case 'cep-profissional':
-        case 'cep-fiador-residencial':
-        case 'fiador-cep-profissional':
-            // Para CEP, se o campo não está vazio e o logradouro está vazio, indica erro na consulta
-            const associatedLogradouro = document.getElementById(inputElement.id.replace('cep', 'logradouro'));
-            if (inputElement.value.trim() !== '' && associatedLogradouro && associatedLogradouro.value.trim() === '') {
-                 isValid = false;
-                 if (errorSpan) errorSpan.textContent = 'CEP inválido ou não encontrado.';
-                 inputElement.classList.add('error-border');
-            }
-            break;
-        case 'remuneracao-mensal':
-        case 'fiador-remuneracao-mensal':
-            // Se o campo monetário é obrigatório e está vazio, ou se tem valor mas não é um número válido (após formatação)
-            if (inputElement.value.trim() === '' && !optionalFieldIds.includes(inputElement.id)) {
-                isValid = false;
-                if (errorSpan) errorSpan.textContent = 'Campo obrigatório.';
-                inputElement.classList.add('error-border');
-            } else if (inputElement.value.trim() !== '' && parseFloat(inputElement.value.replace('R$', '').replace(/\./g, '').replace(',', '.')) === 0) {
-                 // Se o valor é "R$ 0,00" e é obrigatório
-                 isValid = false;
-                 if (errorSpan) errorSpan.textContent = 'Valor deve ser maior que R$ 0,00.';
-                 inputElement.classList.add('error-border');
-            }
-            break;
-        case 'data-nascimento':
-            if (inputElement.value.trim() === '') {
-                isValid = false;
-                if (errorSpan) errorSpan.textContent = 'Campo obrigatório.';
-                inputElement.classList.add('error-border');
-            }
-            break;
-    }
-
-    // Para inputs de arquivo, verifica se é obrigatório e se está vazio
-    if (inputElement.type === 'file') {
-        const parentDiv = inputElement.closest('.input-group');
-        const isRequiredFile = parentDiv && parentDiv.querySelector('label.required'); // Verifica se a label tem a classe 'required'
-        
-        if (isRequiredFile && inputElement.files.length === 0) {
-            isValid = false;
-            if (errorSpan) errorSpan.textContent = 'Documento obrigatório.';
-            inputElement.classList.add('error-border');
-        }
-    }
-
-    // Garante que a borda de erro seja removida se o campo for válido
-    if (isValid) {
-        inputElement.classList.remove('error-border');
-        if (errorSpan) errorSpan.textContent = '';
-    } else {
-        inputElement.classList.add('error-border');
-    }
-
-    return isValid;
-}
-
-
-// Valida o formulário inteiro no momento da submissão
+// --- Funções de Validação Global ---
 function validateForm() {
-    let formIsValid = true;
-    const allInputs = formCadastro.querySelectorAll('input:not([type="hidden"]), select, textarea');
+    let isValid = true;
 
-    allInputs.forEach(input => {
-        // Apenas valida campos que estão visíveis e não desabilitados
+    // Limpa mensagens de erro e bordas de validações anteriores
+    document.querySelectorAll('.input-group .error-message').forEach(msg => {
+        if (msg.textContent === 'Campo obrigatório.') {
+            msg.remove();
+        }
+    });
+    document.querySelectorAll('.error-border').forEach(el => el.classList.remove('error-border'));
+
+    // Valida os campos da primeira seção de seleção (que sempre são visíveis e required no HTML)
+    const initialSelects = document.querySelectorAll('#tipo-locacao, #tipo-pessoa, #tipo-atividade, #estado-civil, #garantia');
+    initialSelects.forEach(input => {
+        if (!input.value.trim()) {
+            isValid = false;
+            input.classList.add('error-border');
+            const errorMessageSpan = document.createElement('span');
+            errorMessageSpan.classList.add('error-message');
+            errorMessageSpan.textContent = 'Campo obrigatório.';
+            input.parentNode.insertBefore(errorMessageSpan, input.nextSibling);
+        }
+    });
+
+
+    // Valida dinamicamente todos os inputs dentro das seções visíveis e não desabilitadas
+    const dynamicSections = [
+        informacoesPessoaisSection,
+        enderecoResidencialSection,
+        dadosProfissionaisSection,
+        informacoesFiadorSection,
+        enderecoFiadorSection,
+        dadosProfissionaisFiadorSection,
+        documentosContainer // Para os inputs de arquivo
+    ];
+
+    // IDs dos campos que NÃO são obrigatórios
+    const optionalFieldIds = [
+        'complemento-residencial',
+        'complemento-profissional',
+        'fiador-complemento-residencial',
+        'fiador-complemento-profissional',
+        'nacionalidade',
+        'naturalidade'
+    ];
+
+    dynamicSections.forEach(section => {
+        // Apenas processa se a seção não estiver oculta
+        if (!section.classList.contains('hidden')) {
+            section.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(input => {
+                // Se o input não estiver desabilitado (ou seja, é visível e ativo)
+                if (!input.disabled) {
+                    // Verifica se o campo está vazio E se NÃO está na lista de campos opcionais
+                    if (input.value.trim() === '' && !input.readOnly && !optionalFieldIds.includes(input.id)) { 
+                        isValid = false;
+                        input.classList.add('error-border');
+                        const existingErrorMessage = input.parentNode.querySelector('.error-message');
+                        if (!existingErrorMessage || existingErrorMessage.textContent === '') {
+                            const errorMessageSpan = document.createElement('span');
+                            errorMessageSpan.classList.add('error-message');
+                            errorMessageSpan.textContent = 'Campo obrigatório.';
+                            input.parentNode.insertBefore(errorMessageSpan, input.nextSibling);
+                        }
+                    } else {
+                        input.classList.remove('error-border');
+                        // Remove a mensagem de erro se o campo for preenchido ou for opcional
+                        const existingErrorMessage = input.parentNode.querySelector('.error-message');
+                        if (existingErrorMessage && existingErrorMessage.textContent === 'Campo obrigatório.') {
+                            existingErrorMessage.remove();
+                        }
+                    }
+                }
+            });
+        }
+    });
+
+
+    // Re-verifica validações específicas para campos que podem ter erros de formato (CPF, RG, Celular, Email)
+    document.querySelectorAll('[id$="-cpf"], [id$="-rg"], [id$="-celular"], [id$="-email"], [id$="-remuneracao-mensal"]').forEach(input => {
+        // Verifica se o input está visível e habilitado antes de validar seu estado
         const parentSection = input.closest('section');
-        const isVisible = !parentSection || !parentSection.classList.contains('hidden');
+        const isVisibleAndEnabled = (!parentSection || !parentSection.classList.contains('hidden')) && !input.disabled;
 
-        if (isVisible && !input.disabled) {
-            // Chama validateField para cada input e atualiza o estado geral do formulário
-            if (!validateField(input)) {
-                formIsValid = false;
+        if (isVisibleAndEnabled) {
+            const errorSpan = input.parentNode.querySelector('.error-message');
+            if (errorSpan && errorSpan.textContent !== '') {
+                isValid = false; // Indica que há um erro de validação de formato
+                input.classList.add('error-border'); // Garante a borda vermelha
+            } else {
+                input.classList.remove('error-border'); // Remove a borda se o campo estiver válido
             }
         }
     });
 
-    if (!formIsValid) {
-        // Se houver erros, rola para o primeiro campo com erro
+    if (!isValid) {
+        alert('Por favor, preencha todos os campos obrigatórios e corrija os erros indicados.');
         const firstInvalid = document.querySelector('.error-border');
         if (firstInvalid) {
             firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
             firstInvalid.focus();
         }
     }
-    return formIsValid;
+
+    return isValid;
 }
-
-// NOVO: Função para calcular e atualizar a barra de progresso
-function updateProgressBar() {
-    const allInputs = formCadastro.querySelectorAll('input:not([type="hidden"]), select, textarea');
-    let totalRequiredVisibleFields = 0;
-    let filledRequiredVisibleFields = 0;
-
-    allInputs.forEach(input => {
-        const parentSection = input.closest('section');
-        const isVisible = !parentSection || !parentSection.classList.contains('hidden');
-        const isOptional = optionalFieldIds.includes(input.id);
-        const isReadOnly = input.readOnly; // Campos somente leitura (CEP)
-
-        // Considera apenas campos visíveis, não desabilitados, não somente leitura e não opcionais
-        if (isVisible && !input.disabled && !isOptional && !isReadOnly) {
-            // Para inputs de arquivo, verifica se a label tem a classe 'required'
-            const isRequiredFile = input.type === 'file' && input.closest('.input-group')?.querySelector('label.required');
-
-            if (input.type !== 'file' || isRequiredFile) { // Inclui todos os tipos de input obrigatórios e inputs de arquivo obrigatórios
-                totalRequiredVisibleFields++;
-                if (input.value.trim() !== '') {
-                    filledRequiredVisibleFields++;
-                } else if (input.type === 'file' && input.files.length > 0) {
-                    filledRequiredVisibleFields++;
-                }
-            }
-        }
-    });
-
-    let progress = 0;
-    if (totalRequiredVisibleFields > 0) {
-        progress = (filledRequiredVisibleFields / totalRequiredVisibleFields) * 100;
-    }
-    
-    progressBar.style.width = `${progress}%`;
-}
-
 
 // NOVO: Função para limpar todos os campos do formulário
 function clearFormFields() {
     formCadastro.querySelectorAll('input, select, textarea').forEach(input => {
+        // Resetar o valor do input
         if (input.type === 'file') {
-            input.value = '';
+            // Para inputs de arquivo, o valor não pode ser definido diretamente por segurança
+            // A melhor forma é resetar o formulário ou criar um novo input de arquivo,
+            // mas para este caso, podemos ignorar ou limpar visualmente se possível.
+            // Para uma limpeza completa, seria necessário resetar o formulário inteiro ou
+            // remover e recriar os inputs de arquivo.
+            input.value = ''; // Tenta limpar, mas pode não funcionar em todos os browsers
         } else if (input.type === 'checkbox' || input.type === 'radio') {
             input.checked = false;
         } else if (input.tagName === 'SELECT') {
-            input.selectedIndex = 0;
+            input.selectedIndex = 0; // Seleciona a primeira opção (geralmente "Selecione...")
         } else {
             input.value = '';
         }
 
+        // Remover bordas de erro
         input.classList.remove('error-border');
+
+        // Remover mensagens de erro
         const errorSpan = input.parentNode.querySelector('.error-message');
         if (errorSpan) {
             errorSpan.textContent = '';
         }
     });
 
+    // Resetar a visibilidade das seções para o estado inicial (escondidas)
     informacoesPessoaisSection.classList.add("hidden");
     enderecoResidencialSection.classList.add("hidden");
     dadosProfissionaisSection.classList.add("hidden");
@@ -730,8 +641,8 @@ function clearFormFields() {
     enderecoFiadorSection.classList.add("hidden");
     dadosProfissionaisFiadorSection.classList.add("hidden");
 
-    atualizarDocumentos(); // Re-executa para redefinir os campos de anexo e suas instruções
-    updateProgressBar(); // Reseta o progresso
+    // Re-executar atualizarDocumentos para redefinir os campos de anexo (já que são dinâmicos)
+    atualizarDocumentos();
 }
 
 
@@ -739,30 +650,33 @@ function clearFormFields() {
 
 // Listeners para os selects iniciais (sempre presentes)
 [tipoPessoa, tipoAtividade, estadoCivil, tipoLocacao, garantia].forEach(el =>
-    el.addEventListener("change", () => {
-        atualizarDocumentos(); // Atualiza seções e documentos
-        updateProgressBar();   // Atualiza o progresso
-    })
+    el.addEventListener("change", atualizarDocumentos)
 );
 
-// Adiciona listeners 'blur' e 'input' para validação em tempo real e atualização do progresso
+window.addEventListener("DOMContentLoaded", atualizarDocumentos);
+
+
+// Delegação de eventos para inputs que podem ser adicionados/removidos/habilitados/desabilitados
 formCadastro.addEventListener('input', function(event) {
     const target = event.target;
-    if (target.disabled) return;
+    if (target.disabled) return; // Não processa eventos de campos desabilitados
 
     switch (target.id) {
         case 'cep-residencial':
             formatCepInput(target);
-            // consultaCEP é async, updateProgressBar é chamado dentro dela
+            consultarCep(target, 'residencial');
             break;
         case 'cep-profissional':
             formatCepInput(target);
+            consultarCep(target, 'profissional');
             break;
         case 'cep-fiador-residencial':
             formatCepInput(target);
+            consultarCep(target, 'fiador-residencial');
             break;
         case 'fiador-cep-profissional':
             formatCepInput(target);
+            consultarCep(target, 'fiador-profissional');
             break;
         case 'cpf':
         case 'fiador-cpf':
@@ -784,48 +698,18 @@ formCadastro.addEventListener('input', function(event) {
         case 'fiador-remuneracao-mensal':
             formatCurrencyInput(target);
             break;
-        default:
-            // Para outros campos de texto/data/número, apenas valida e atualiza progresso
-            validateField(target);
-            updateProgressBar();
-            break;
     }
-});
-
-formCadastro.addEventListener('blur', function(event) {
-    const target = event.target;
-    // Evita validar selects que já disparam 'change' e causam 'input'
-    if (target.tagName === 'SELECT' || target.disabled || target.type === 'file') return; 
-
-    // Chama a validação para o campo ao perder o foco (blur)
-    validateField(target);
-    updateProgressBar();
-}, true); // Use 'true' para fase de captura, para pegar o evento antes de elementos internos
-
-// Listener para campos de arquivo para atualização do progresso
-formCadastro.addEventListener('change', function(event) {
-    const target = event.target;
-    if (target.type === 'file') {
-        validateField(target); // Valida o campo de arquivo ao selecionar
-        updateProgressBar();
-    }
-});
-
-
-window.addEventListener("DOMContentLoaded", () => {
-    atualizarDocumentos(); // Inicializa as seções e documentos
-    updateProgressBar();   // Inicializa a barra de progresso
 });
 
 
 formCadastro.addEventListener('submit', async function(event) {
-    event.preventDefault();
+    event.preventDefault(); // Impede o envio padrão do formulário para validação customizada
 
-    // Valida todo o formulário antes de tentar enviar
     if (!validateForm()) {
-        return;
+        return; // Para a submissão se a validação falhar
     }
 
+    // Mostra o overlay de carregamento
     showLoadingOverlay();
 
     const form = event.target;
@@ -841,12 +725,13 @@ formCadastro.addEventListener('submit', async function(event) {
 
         if (response.ok) {
             const result = await response.json();
+            // NOVO: Limpa o formulário antes de redirecionar
             clearFormFields(); 
+            // Esconde o overlay antes de redirecionar
             hideLoadingOverlay();
             window.location.href = 'sucesso.html'; 
         } else {
             const errorData = await response.json().catch(() => ({ message: 'Erro desconhecido no servidor.' }));
-            // Em caso de erro, não redireciona, apenas mostra o alerta e esconde o overlay
             alert(`Erro ao enviar formulário: ${errorData.message || 'Ocorreu um problema ao processar sua solicitação.'}`);
             console.error('Detalhes do erro do backend:', errorData);
         }
@@ -854,6 +739,7 @@ formCadastro.addEventListener('submit', async function(event) {
         alert('Não foi possível conectar ao servidor. Verifique sua conexão ou tente novamente mais tarde.');
         console.error('Erro na requisição fetch:', error);
     } finally {
+        // Garante que o overlay seja escondido mesmo em caso de erro na requisição
         hideLoadingOverlay();
     }
 });

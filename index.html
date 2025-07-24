@@ -179,24 +179,6 @@
       font-weight: 600;
     }
 
-    /* Estilos para a Barra de Progresso */
-    .progress-container {
-      width: 100%;
-      background-color: #e0e0e0;
-      border-radius: 5px;
-      margin-bottom: 2rem;
-      height: 10px; /* Altura da barra */
-      overflow: hidden; /* Garante que a barra interna não vaze */
-    }
-
-    .progress-bar {
-      height: 100%;
-      width: 0%; /* Começa em 0% */
-      background-color: var(--primary-color);
-      border-radius: 5px;
-      transition: width 0.4s ease-in-out; /* Animação suave */
-    }
-
     /* Media Queries para Responsividade */
     @media (max-width: 768px) {
       body {
@@ -253,11 +235,6 @@
       <img src="logo2024.png" alt="Logo da Empresa">
     </div>
     <h1>Ficha Cadastral para Locação</h1>
-
-    <!-- Barra de Progresso -->
-    <div class="progress-container">
-      <div class="progress-bar" id="progress-bar"></div>
-    </div>
 
     <form id="form-cadastro">
       <section>
@@ -337,11 +314,11 @@
             <input type="date" id="data-nascimento" name="data-nascimento" />
           </div>
           <div class="input-group">
-            <label for="nacionalidade">Nacionalidade:</label>
+            <label for="nacionalidade">Nacionalidade:</label> <!-- Não mais obrigatório -->
             <input type="text" id="nacionalidade" name="nacionalidade" />
           </div>
           <div class="input-group">
-            <label for="naturalidade">Naturalidade:</label>
+            <label for="naturalidade">Naturalidade:</label> <!-- Não mais obrigatório -->
             <input type="text" id="naturalidade" name="naturalidade" />
           </div>
           <div class="input-group">
@@ -374,7 +351,7 @@
             <input type="text" id="numero-residencial" name="numero-residencial" />
           </div>
           <div class="input-group">
-            <label for="complemento-residencial">Complemento:</label>
+            <label for="complemento-residencial">Complemento:</label> <!-- Não mais obrigatório -->
             <input type="text" id="complemento-residencial" name="complemento-residencial" />
           </div>
           <div class="input-group">
@@ -421,7 +398,7 @@
             <input type="text" id="numero-profissional" name="numero-profissional" />
           </div>
           <div class="input-group">
-            <label for="complemento-profissional">Complemento Profissional:</label>
+            <label for="complemento-profissional">Complemento Profissional:</label> <!-- Não mais obrigatório -->
             <input type="text" id="complemento-profissional" name="complemento-profissional" />
           </div>
           <div class="input-group">
@@ -473,10 +450,87 @@
         </div>
       </section>
 
+      <section id="endereco-fiador-section" class="hidden">
+        <h2>Endereço Residencial do Fiador</h2>
+        <div class="form-grid">
+          <div class="input-group">
+            <label for="cep-fiador-residencial" class="required">CEP do Fiador:</label>
+            <input type="text" id="cep-fiador-residencial" name="fiador-cep-residencial" maxlength="9" placeholder="00000-000" />
+            <span class="error-message" id="cep-fiador-residencial-error"></span>
+          </div>
+          <div class="input-group">
+            <label for="logradouro-fiador-residencial" class="required">Logradouro do Fiador:</label>
+            <input type="text" id="logradouro-fiador-residencial" name="fiador-logradouro-residencial" readonly />
+          </div>
+          <div class="input-group">
+            <label for="numero-fiador-residencial" class="required">Número do Fiador:</label>
+            <input type="text" id="numero-fiador-residencial" name="fiador-numero-residencial" />
+          </div>
+          <div class="input-group">
+            <label for="complemento-fiador-residencial">Complemento do Fiador:</label> <!-- Não mais obrigatório -->
+            <input type="text" id="complemento-fiador-residencial" name="fiador-complemento-residencial" />
+          </div>
+          <div class="input-group">
+            <label for="bairro-fiador-residencial" class="required">Bairro do Fiador:</label>
+            <input type="text" id="bairro-fiador-residencial" name="fiador-bairro-residencial" readonly />
+          </div>
+          <div class="input-group">
+            <label for="cidade-fiador-residencial" class="required">Cidade do Fiador:</label>
+            <input type="text" id="cidade-fiador-residencial" name="fiador-cidade-residencial" readonly />
+          </div>
+          <div class="input-group">
+            <label for="estado-fiador-residencial" class="required">Estado do Fiador:</label>
+            <input type="text" id="estado-fiador-residencial" name="fiador-estado-residencial" readonly />
+          </div>
+        </div>
+      </section>
+
+      <section id="dados-profissionais-fiador-section" class="hidden">
+        <h2>Dados Profissionais do Fiador</h2>
+        <div class="form-grid">
+          <div class="input-group">
+            <label for="fiador-nome-empresa" class="required">Nome da Empresa do Fiador:</label>
+            <input type="text" id="fiador-nome-empresa" name="fiador-nome-empresa" />
+          </div>
+          <div class="input-group">
+            <label for="fiador-cargo" class="required">Cargo do Fiador:</label>
+            <input type="text" id="fiador-cargo" name="fiador-cargo" />
+          </div>
+          <div class="input-group">
+            <label for="fiador-cep-profissional" class="required">CEP Profissional do Fiador:</label>
+            <input type="text" id="fiador-cep-profissional" name="fiador-cep-profissional" maxlength="9" placeholder="00000-000" />
+            <span class="error-message" id="fiador-cep-profissional-error"></span>
+          </div>
+          <div class="input-group">
+            <label for="fiador-logradouro-profissional" class="required">Logradouro Profissional do Fiador:</label>
+            <input type="text" id="fiador-logradouro-profissional" name="fiador-logradouro-profissional" readonly />
+          </div>
+          <div class="input-group">
+            <label for="fiador-numero-profissional" class="required">Número Profissional do Fiador:</label>
+            <input type="text" id="fiador-numero-profissional" name="fiador-numero-profissional" />
+          </div>
+          <div class="input-group">
+            <label for="complemento-profissional">Complemento Profissional do Fiador:</label> <!-- Não mais obrigatório -->
+            <input type="text" id="fiador-complemento-profissional" name="fiador-complemento-profissional" />
+          </div>
+          <div class="input-group">
+            <label for="fiador-bairro-profissional" class="required">Bairro Profissional do Fiador:</label>
+            <input type="text" id="fiador-bairro-profissional" name="fiador-bairro-profissional" readonly />
+          </div>
+          <div class="input-group">
+            <label for="fiador-cidade-profissional" class="required">Cidade Profissional do Fiador:</label>
+            <input type="text" id="fiador-cidade-profissional" name="fiador-cidade-profissional" readonly />
+          </div>
+          <div class="input-group">
+            <label for="fiador-estado-profissional" class="required">Estado Profissional do Fiador:</label>
+            <input type="text" id="fiador-estado-profissional" name="fiador-estado-profissional" readonly />
+          </div>
+        </div>
+      </section>
+
       <section>
         <h2>Documentos para Anexo</h2>
         <div class="form-grid" id="documentos-container">
-          <!-- Documentos serão inseridos aqui dinamicamente pelo script.js -->
         </div>
       </section>
 
