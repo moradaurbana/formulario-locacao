@@ -20,14 +20,20 @@ const informacoesFiadorSection = document.getElementById("informacoes-fiador-sec
 const enderecoFiadorSection = document.getElementById("endereco-fiador-section");
 const dadosProfissionaisFiadorSection = document.getElementById("dados-profissionais-fiador-section");
 
-// IDs dos campos que NÃO são obrigatórios (para validação)
+// Novos elementos para a lógica de Nacionalidade
+const nacionalidadeSelect = document.getElementById('nacionalidade');
+const nacionalidadeBrasileiraGroup = document.getElementById('nacionalidade-brasileira-group');
+const nacionalidadeEstrangeiraGroup = document.getElementById('nacionalidade-estrangeira-group');
+const nacionalidadeDuplaGroup = document.getElementById('nacionalidade-dupla-group');
+const nacionalidadeOutraGroup = document.getElementById('nacionalidade-outra-group');
+
+// IDs dos campos que SÃO OPCIONAIS (não obrigatórios) por padrão
 const optionalFieldIds = [
     'complemento-residencial',
     'complemento-profissional',
     'fiador-complemento-residencial',
-    'fiador-complemento-profissional',
-    'nacionalidade', // Continua aqui
-    'naturalidade'
+    'fiador-complemento-profissional'
+    // 'nacionalidade' e 'naturalidade' foram removidos daqui, pois sua obrigatoriedade é dinâmica
 ];
 
 // --- Funções de Utilitário ---
@@ -295,12 +301,13 @@ function formatCurrencyInput(inputElement) {
 function toggleSectionInputs(section, enable) {
     section.querySelectorAll('input, select, textarea').forEach(input => {
         // Exclui os selects da seleção inicial, pois eles controlam a lógica de exibição
-        if (input.id !== 'tipo-locacao' && input.id !== 'tipo-pessoa' && input.id !== 'tipo-atividade' && input.id !== 'estado-civil' && input.id !== 'garantia') {
+        if (input.id !== 'tipo-locacao' && input.id !== 'tipo-pessoa' && input.id !== 'tipo-atividade' && input.id !== 'estado-civil' && input.id !== 'garantia' && input.id !== 'nacionalidade') {
             input.disabled = !enable;
+            // Limpa o valor e o estado de erro quando o campo é desabilitado
             if (!enable) {
-                // Limpa o valor e o estado de erro quando o campo é desabilitado
                 input.value = '';
                 input.classList.remove('error-border');
+                input.removeAttribute('required'); // Remove o atributo required
                 const errorSpan = input.parentNode.querySelector('.error-message');
                 if (errorSpan) {
                     errorSpan.textContent = '';
@@ -309,6 +316,59 @@ function toggleSectionInputs(section, enable) {
         }
     });
 }
+
+// Função para esconder e limpar todos os grupos de nacionalidade
+function hideAllNacionalidadeGroups() {
+    [nacionalidadeBrasileiraGroup, nacionalidadeEstrangeiraGroup, nacionalidadeDuplaGroup, nacionalidadeOutraGroup].forEach(group => {
+        group.classList.add('hidden');
+        toggleSectionInputs(group, false); // Desabilita e limpa os campos do grupo
+    });
+}
+
+// Função para exibir os campos de nacionalidade e definir obrigatoriedade
+function toggleNacionalidadeFields() {
+    hideAllNacionalidadeGroups(); // Esconde e limpa todos antes de mostrar o correto
+
+    const selectedNacionalidade = nacionalidadeSelect.value;
+
+    switch (selectedNacionalidade) {
+        case 'brasileira':
+            nacionalidadeBrasileiraGroup.classList.remove('hidden');
+            toggleSectionInputs(nacionalidadeBrasileiraGroup, true);
+            // Campos obrigatórios para Brasileira
+            document.getElementById('uf_nascimento').setAttribute('required', 'true');
+            document.getElementById('cidade_nascimento').setAttribute('required', 'true');
+            break;
+        case 'estrangeira':
+            nacionalidadeEstrangeiraGroup.classList.remove('hidden');
+            toggleSectionInputs(nacionalidadeEstrangeiraGroup, true);
+            // Campos obrigatórios para Estrangeira
+            document.getElementById('pais_nascimento').setAttribute('required', 'true');
+            // Cidade no País de Origem é opcional, então não setamos 'required'
+            document.getElementById('cidade_origem').removeAttribute('required');
+            break;
+        case 'dupla':
+            nacionalidadeDuplaGroup.classList.remove('hidden');
+            toggleSectionInputs(nacionalidadeDuplaGroup, true);
+            // Campos obrigatórios para Dupla Nacionalidade
+            document.getElementById('pais_principal').setAttribute('required', 'true');
+            document.getElementById('cidade_principal').setAttribute('required', 'true');
+            // Segundo País e Segunda Cidade são opcionais
+            document.getElementById('segundo_pais').removeAttribute('required');
+            document.getElementById('segunda_cidade').removeAttribute('required');
+            break;
+        case 'outra':
+            nacionalidadeOutraGroup.classList.remove('hidden');
+            toggleSectionInputs(nacionalidadeOutraGroup, true);
+            // Campo obrigatório para Outra
+            document.getElementById('naturalidade_texto_livre').setAttribute('required', 'true');
+            break;
+        default:
+            // Se "Selecione..." ou vazio, todos ficam escondidos e não obrigatórios
+            break;
+    }
+}
+
 
 function resetPjLabels() {
     // Labels do Locatário/Sócio/Representante
@@ -541,7 +601,11 @@ function validateForm() {
         informacoesFiadorSection,
         enderecoFiadorSection,
         dadosProfissionaisFiadorSection,
-        documentosContainer // Para os inputs de arquivo
+        documentosContainer, // Para os inputs de arquivo
+        nacionalidadeBrasileiraGroup, // Inclui os novos grupos de nacionalidade
+        nacionalidadeEstrangeiraGroup,
+        nacionalidadeDuplaGroup,
+        nacionalidadeOutraGroup
     ];
 
     dynamicSections.forEach(section => {
@@ -550,8 +614,12 @@ function validateForm() {
             section.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(input => {
                 // Se o input não estiver desabilitado (ou seja, é visível e ativo)
                 if (!input.disabled) {
-                    // Verifica se o campo está vazio E se NÃO está na lista de campos opcionais
-                    if (input.value.trim() === '' && !input.readOnly && !optionalFieldIds.includes(input.id)) { 
+                    // Verifica se o campo está vazio E se ele é obrigatório (tem o atributo 'required')
+                    // Ou se ele não é readonly e não está na lista de campos opcionais
+                    const isRequiredByAttribute = input.hasAttribute('required');
+                    const isExplicitlyOptional = optionalFieldIds.includes(input.id);
+
+                    if (input.value.trim() === '' && !input.readOnly && (isRequiredByAttribute || !isExplicitlyOptional)) {
                         isValid = false;
                         input.classList.add('error-border');
                         const existingErrorMessage = input.parentNode.querySelector('.error-message');
@@ -618,6 +686,7 @@ function clearFormFields() {
         }
 
         input.classList.remove('error-border');
+        input.removeAttribute('required'); // Remove o atributo required ao limpar
         const errorSpan = input.parentNode.querySelector('.error-message');
         if (errorSpan) {
             errorSpan.textContent = '';
@@ -632,6 +701,7 @@ function clearFormFields() {
     dadosProfissionaisFiadorSection.classList.add("hidden");
 
     atualizarDocumentos(); // Re-executa para redefinir os campos de anexo
+    toggleNacionalidadeFields(); // Reseta os campos de nacionalidade
 }
 
 
@@ -642,7 +712,13 @@ function clearFormFields() {
     el.addEventListener("change", atualizarDocumentos)
 );
 
-window.addEventListener("DOMContentLoaded", atualizarDocumentos);
+window.addEventListener("DOMContentLoaded", () => {
+    atualizarDocumentos(); // Inicializa as seções e documentos
+    toggleNacionalidadeFields(); // Inicializa os campos de nacionalidade
+});
+
+// Listener para o select de Nacionalidade
+nacionalidadeSelect.addEventListener('change', toggleNacionalidadeFields);
 
 
 // Delegação de eventos para inputs que podem ser adicionados/removidos/habilitados/desabilitados
