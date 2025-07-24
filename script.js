@@ -8,7 +8,7 @@ const estadoCivil = document.getElementById("estado-civil");
 const tipoLocacao = document.getElementById("tipo-locacao");
 const garantia = document.getElementById("garantia");
 const documentosContainer = document.getElementById("documentos-container");
-const loadingOverlay = document.getElementById('loading-overlay'); // Novo: Elemento do overlay de carregamento
+const loadingOverlay = document.getElementById('loading-overlay'); // Elemento do overlay de carregamento
 
 // Seções principais do locatário (também sempre existem, mas podem ser hidden/shown)
 const informacoesPessoaisSection = document.getElementById("informacoes-pessoais-section");
@@ -89,7 +89,7 @@ async function consultarCep(inputElement, type) {
                 if (logradouroInput) logradouroInput.value = data.street;
                 if (bairroInput) bairroInput.value = data.neighborhood;
                 if (cidadeInput) cidadeInput.value = data.city;
-                if (estadoInput) estadoInput.value = data.state;
+                if (estadoInput) inputElement.value = data.state; // Corrigido para inputElement
                 if (cepErrorSpan) cepErrorSpan.textContent = "";
                 return; // Sai se Brasil API for bem-sucedido
             } else {
@@ -604,6 +604,47 @@ function validateForm() {
     return isValid;
 }
 
+// NOVO: Função para limpar todos os campos do formulário
+function clearFormFields() {
+    formCadastro.querySelectorAll('input, select, textarea').forEach(input => {
+        // Resetar o valor do input
+        if (input.type === 'file') {
+            // Para inputs de arquivo, o valor não pode ser definido diretamente por segurança
+            // A melhor forma é resetar o formulário ou criar um novo input de arquivo,
+            // mas para este caso, podemos ignorar ou limpar visualmente se possível.
+            // Para uma limpeza completa, seria necessário resetar o formulário inteiro ou
+            // remover e recriar os inputs de arquivo.
+            input.value = ''; // Tenta limpar, mas pode não funcionar em todos os browsers
+        } else if (input.type === 'checkbox' || input.type === 'radio') {
+            input.checked = false;
+        } else if (input.tagName === 'SELECT') {
+            input.selectedIndex = 0; // Seleciona a primeira opção (geralmente "Selecione...")
+        } else {
+            input.value = '';
+        }
+
+        // Remover bordas de erro
+        input.classList.remove('error-border');
+
+        // Remover mensagens de erro
+        const errorSpan = input.parentNode.querySelector('.error-message');
+        if (errorSpan) {
+            errorSpan.textContent = '';
+        }
+    });
+
+    // Resetar a visibilidade das seções para o estado inicial (escondidas)
+    informacoesPessoaisSection.classList.add("hidden");
+    enderecoResidencialSection.classList.add("hidden");
+    dadosProfissionaisSection.classList.add("hidden");
+    informacoesFiadorSection.classList.add("hidden");
+    enderecoFiadorSection.classList.add("hidden");
+    dadosProfissionaisFiadorSection.classList.add("hidden");
+
+    // Re-executar atualizarDocumentos para redefinir os campos de anexo (já que são dinâmicos)
+    atualizarDocumentos();
+}
+
 
 // --- Event Listeners ---
 
@@ -668,7 +709,7 @@ formCadastro.addEventListener('submit', async function(event) {
         return; // Para a submissão se a validação falhar
     }
 
-    // NOVO: Mostra o overlay de carregamento
+    // Mostra o overlay de carregamento
     showLoadingOverlay();
 
     const form = event.target;
@@ -684,6 +725,8 @@ formCadastro.addEventListener('submit', async function(event) {
 
         if (response.ok) {
             const result = await response.json();
+            // NOVO: Limpa o formulário antes de redirecionar
+            clearFormFields(); 
             // Esconde o overlay antes de redirecionar
             hideLoadingOverlay();
             window.location.href = 'sucesso.html'; 
