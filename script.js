@@ -702,7 +702,12 @@ document.querySelectorAll('input[name*="remuneracao-mensal"]').forEach(input => 
 
 formCadastro.addEventListener('submit', async function(event) {
     event.preventDefault();
-    loadingOverlay.classList.add('visible');
+
+    // Resetar estilos de erro
+    formCadastro.querySelectorAll('.error-border, .error').forEach(el => {
+        el.classList.remove('error-border', 'error');
+    });
+
     let isValid = true;
     const requiredInputs = formCadastro.querySelectorAll('input[required]:not(:disabled), select[required]:not(:disabled)');
     requiredInputs.forEach(input => {
@@ -732,9 +737,12 @@ formCadastro.addEventListener('submit', async function(event) {
 
     if (!isValid) {
         alert("Por favor, preencha todos os campos obrigatórios.");
-        loadingOverlay.classList.remove('visible');
         return;
     }
+    
+    // --- Melhoria Adicionada: Exibe a tela de carregamento antes do envio ---
+    loadingOverlay.classList.add('visible');
+
     const formData = new FormData(formCadastro);
     try {
         const response = await fetch("https://formulario-locacao-app-16f3a36a3730.herokuapp.com/", {
@@ -752,6 +760,7 @@ formCadastro.addEventListener('submit', async function(event) {
         alert("Não foi possível conectar com o servidor. Verifique sua conexão e tente novamente.");
         console.error("Erro ao enviar o formulário:", error);
     } finally {
+        // --- Melhoria Adicionada: Esconde a tela de carregamento após a conclusão ou erro ---
         loadingOverlay.classList.remove('visible');
     }
 });
