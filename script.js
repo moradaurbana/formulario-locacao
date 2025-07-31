@@ -739,8 +739,7 @@ formCadastro.addEventListener('submit', async function(event) {
         alert("Por favor, preencha todos os campos obrigatórios.");
         return;
     }
-    
-    // --- Melhoria Adicionada: Exibe a tela de carregamento antes do envio ---
+
     loadingOverlay.classList.add('visible');
 
     const formData = new FormData(formCadastro);
@@ -760,7 +759,6 @@ formCadastro.addEventListener('submit', async function(event) {
         alert("Não foi possível conectar com o servidor. Verifique sua conexão e tente novamente.");
         console.error("Erro ao enviar o formulário:", error);
     } finally {
-        // --- Melhoria Adicionada: Esconde a tela de carregamento após a conclusão ou erro ---
         loadingOverlay.classList.remove('visible');
     }
 });
