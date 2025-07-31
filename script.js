@@ -752,12 +752,13 @@ formCadastro.addEventListener('submit', async function(event) {
         if (response.ok) {
             window.location.href = "sucesso.html";
         } else {
-            alert("Ocorreu um erro ao enviar a ficha. Por favor, tente novamente.");
-            console.error("Erro no servidor:", response.status, response.statusText);
+            // Redireciona para a página de erro se o envio não for bem-sucedido
+            window.location.href = "erro.html";
         }
     } catch (error) {
-        alert("Não foi possível conectar com o servidor. Verifique sua conexão e tente novamente.");
         console.error("Erro ao enviar o formulário:", error);
+        // Redireciona para a página de erro em caso de falha na conexão
+        window.location.href = "erro.html";
     } finally {
         loadingOverlay.classList.remove('visible');
     }
