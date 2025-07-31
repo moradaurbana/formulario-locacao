@@ -1,604 +1,575 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ficha Cadastral Dinâmica</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      /* Cores baseadas em moradaurbana.com.br */
-      --primary-color: #005A8D; /* Azul escuro principal (cabeçalho, botões) */
-      --secondary-color: #007BFF; /* Azul mais claro para ênfase (títulos de seção) */
-      --accent-color: #28a745; /* Verde para sucesso (mantido para feedback positivo) */
-      --text-color: #333; /* Texto geral escuro */
-      --light-text-color: #555; /* Texto mais claro para labels/descrições */
-      --background-color: #f8f8f8; /* Fundo geral da página */
-      --container-bg: #fff; /* Fundo dos cards/formulários */
-      --border-color: #e0e0e0; /* Bordas suaves */
-      --shadow-light: rgba(0, 0, 0, 0.04); /* Sombra muito leve */
-      --shadow-medium: rgba(0, 0, 0, 0.08); /* Sombra padrão para elementos */
-      --error-color: #dc3545; /* Cor de erro */
-    }
-
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: var(--background-color);
-      margin: 0;
-      padding: 1rem;
-      color: var(--text-color);
-      line-height: 1.6;
-    }
-    .form-container {
-      max-width: 1000px;
-      margin: 2rem auto;
-      background: var(--container-bg);
-      padding: 2.5rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px var(--shadow-medium); /* Sombra mais suave */
-      border: 1px solid var(--border-color); /* Borda mais sutil */
-    }
-    .header-logo {
-      text-align: center;
-      margin-bottom: 2rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border-color); /* Borda sutil para separar */
-    }
-    .header-logo img {
-      max-width: 180px;
-      height: auto;
-      border-radius: 8px; /* Bordas arredondadas para o logo */
-      box-shadow: 0 2px 8px var(--shadow-light); /* Sombra leve no logo */
-    }
-    h1 {
-      text-align: center;
-      color: var(--primary-color); /* Título principal com cor primária */
-      margin-bottom: 2rem;
-      font-size: 2.2rem;
-      font-weight: 700;
-    }
-    h2 {
-      color: var(--secondary-color); /* Títulos de seção com cor secundária */
-      margin-top: 2.5rem;
-      margin-bottom: 1.5rem;
-      font-size: 1.6rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 2px solid var(--primary-color); /* Borda com cor primária */
-    }
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-    .input-group {
-      display: flex;
-      flex-direction: column;
-    }
-    label {
-      font-weight: 500;
-      margin-bottom: 0.4rem;
-      color: var(--light-text-color);
-    }
-    select, input[type="text"], input[type="date"], input[type="email"], input[type="tel"], input[type="file"], input[type="number"] {
-      padding: 0.8rem 1rem;
-      border: 1px solid var(--border-color);
-      border-radius: 8px; /* Bordas arredondadas para inputs */
-      font-size: 1rem;
-      color: var(--text-color);
-      box-shadow: inset 0 1px 3px var(--shadow-light); /* Sombra interna suave */
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    select:focus, input:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(0, 90, 141, 0.25); /* Sombra de foco mais sutil */
-      outline: none;
-    }
-    input[type="file"] {
-      padding: 0.5rem 1rem;
-    }
-    .error-message {
-      color: var(--error-color);
-      font-size: 0.85rem;
-      margin-top: 0.4rem;
-      font-weight: 400;
-    }
-    .error-border {
-        border-color: var(--error-color) !important;
-        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25) !important;
-    }
-    button {
-      background-color: var(--primary-color);
-      color: white;
-      padding: 1rem 1.5rem;
-      border: none;
-      border-radius: 8px; /* Bordas arredondadas para botões */
-      cursor: pointer;
-      font-size: 1.1rem;
-      font-weight: 600;
-      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-      display: block;
-      width: fit-content;
-      margin: 2rem auto 0;
-      box-shadow: 0 4px 10px rgba(0, 90, 141, 0.2); /* Sombra padrão do botão */
-    }
-    button:hover {
-      background-color: #004a75; /* Tom mais escuro no hover */
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0, 90, 141, 0.3); /* Sombra mais pronunciada no hover */
-    }
-    button:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 5px rgba(0, 90, 141, 0.3); /* Sombra menor no active */
-    }
-    .hidden {
-      display: none !important;
-    }
-
-    /* Estilos para o Overlay de Carregamento */
-    .loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(255, 255, 255, 0.85); /* Fundo um pouco mais opaco */
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-
-    .loading-overlay.visible {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .loading-spinner {
-      border: 8px solid var(--border-color); /* Cor da borda do spinner */
-      border-top: 8px solid var(--primary-color); /* Cor primária para o spinner */
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      animation: spin 1s linear infinite;
-      margin-bottom: 20px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .loading-message {
-      color: var(--primary-color);
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
-
-    /* Media Queries para Responsividade */
-    @media (max-width: 768px) {
-      body {
-        padding: 0.8rem; /* Ajuste para mobile */
-      }
-      .form-container {
-        margin: 1rem;
-        padding: 1.5rem;
-      }
-      h1 {
-        font-size: 1.8rem;
-      }
-      h2 {
-        font-size: 1.4rem;
-      }
-      .form-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-      button {
-        width: 100%;
-        padding: 0.9rem 1rem;
-        font-size: 1rem;
-      }
-      .loading-spinner {
-        width: 40px;
-        height: 40px;
-        border-width: 6px;
-      }
-      .loading-message {
-        font-size: 1.2rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .form-container {
-        padding: 1rem;
-      }
-      h1 {
-        font-size: 1.6rem;
-      }
-      h2 {
-        font-size: 1.2rem;
-      }
-      label, select, input {
-        font-size: 0.9rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ficha Cadastral Dinâmica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="form-container">
+<main class="form-container">
     <div class="header-logo">
-      <img src="logo2024.png" alt="Logo da Empresa">
+        <img src="logo2024.png" alt="Logo da Empresa">
     </div>
     <h1>Ficha Cadastral para Locação</h1>
 
     <form id="form-cadastro">
-      <section>
-        <h2>Seleção Inicial</h2>
-        <div class="form-grid">
-          <div class="input-group">
-            <label for="tipo-locacao" class="required">Tipo de Locação:</label>
-            <select id="tipo-locacao" name="tipo-locacao" required>
-              <option value="">Selecione...</option>
-              <option value="residencial">Residencial</option>
-              <option value="comercial">Comercial</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label for="tipo-pessoa" class="required">Tipo de Pessoa:</label>
-            <select id="tipo-pessoa" name="tipo-pessoa" required>
-              <option value="">Selecione...</option>
-              <option value="pf">Pessoa Física</option>
-              <option value="pj">Pessoa Jurídica</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label for="tipo-atividade" class="required">Tipo de Atividade:</label>
-            <select id="tipo-atividade" name="tipo-atividade" required>
-              <option value="">Selecione...</option>
-              <option value="clt">CLT</option>
-              <option value="liberal">Profissional Liberal</option>
-              <option value="empresario">Empresário</option>
-              <option value="aposentado">Aposentado/Pensionista</option>
-              <option value="estudante">Estudante</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label for="estado-civil" class="required">Estado Civil:</label>
-            <select id="estado-civil" name="estado-civil" required>
-              <option value="">Selecione...</option>
-              <option value="solteiro">Solteiro(a)</option>
-              <option value="casado">Casado(a)</option>
-              <option value="uniao-estavel">União Estável</option>
-              <option value="divorciado">Divorciado(a)</option>
-              <option value="separado">Separado(a)</option>
-              <option value="viuvo">Viúvo(a)</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label for="garantia" class="required">Garantia:</label>
-            <select id="garantia" name="garantia" required>
-              <option value="">Selecione...</option>
-              <option value="fiador">Fiador</option>
-              <option value="seguro-fianca">Seguro Fiança</option>
-              <option value="capitalizacao">Título de Capitalização</option>
-              <option value="caucao">Caução</option>
-            </select>
-          </div>
-        </div>
-      </section>
-
-      <section id="informacoes-pessoais-section" class="hidden">
-        <h2>Informações Pessoais</h2>
-        <div class="form-grid">
-          <div class="input-group">
-            <label for="nome-completo" class="required">Nome Completo:</label>
-            <input type="text" id="nome-completo" name="nome-completo" />
-          </div>
-          <div class="input-group">
-            <label for="cpf" class="required">CPF:</label>
-            <input type="text" id="cpf" name="cpf" maxlength="14" placeholder="000.000.000-00" />
-            <span class="error-message" id="cpf-error"></span>
-          </div>
-          <div class="input-group">
-            <label for="rg" class="required">RG:</label>
-            <input type="text" id="rg" name="rg" maxlength="12" placeholder="00.000.000-0" />
-            <span class="error-message" id="rg-error"></span>
-          </div>
-          <div class="input-group">
-            <label for="data-nascimento" class="required">Data de Nascimento:</label>
-            <input type="date" id="data-nascimento" name="data-nascimento" />
-          </div>
-          <div class="input-group">
-            <label for="nacionalidade">Nacionalidade:</label>
-            <select id="nacionalidade" name="nacionalidade">
-              <option value="">Selecione...</option>
-              <option value="brasileira">Brasileira</option>
-              <option value="estrangeira">Estrangeira</option>
-              <option value="dupla">Dupla nacionalidade</option>
-              <option value="outra">Outra</option>
-            </select>
-          </div>
-
-          <!-- Campos Condicionais para Nacionalidade -->
-          <div id="nacionalidade-brasileira-group" class="form-grid hidden">
-            <div class="input-group">
-              <label for="uf_nascimento">Estado de Nascimento (UF):</label>
-              <select id="uf_nascimento" name="uf_nascimento">
-                <option value="">Selecione...</option>
-                <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option><option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option><option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option><option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option><option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option><option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option><option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option><option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option><option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
-              </select>
+        <section>
+            <h2>Seleção Inicial</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="tipo-locacao" class="required">Tipo de Locação:</label>
+                    <select id="tipo-locacao" name="tipo-locacao" required>
+                        <option value="">Selecione...</option>
+                        <option value="residencial">Residencial</option>
+                        <option value="comercial">Comercial</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="tipo-pessoa" class="required">Tipo de Pessoa:</label>
+                    <select id="tipo-pessoa" name="tipo-pessoa" required>
+                        <option value="">Selecione...</option>
+                        <option value="pf">Pessoa Física</option>
+                        <option value="pj">Pessoa Jurídica</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="tipo-atividade" class="required">Tipo de Atividade:</label>
+                    <select id="tipo-atividade" name="tipo-atividade" required>
+                        <option value="">Selecione...</option>
+                        <option value="clt">CLT</option>
+                        <option value="liberal">Profissional Liberal</option>
+                        <option value="empresario">Empresário</option>
+                        <option value="aposentado">Aposentado/Pensionista</option>
+                        <option value="estudante">Estudante</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="estado-civil" class="required">Estado Civil:</label>
+                    <select id="estado-civil" name="estado-civil" required>
+                        <option value="">Selecione...</option>
+                        <option value="solteiro">Solteiro(a)</option>
+                        <option value="casado">Casado(a)</option>
+                        <option value="uniao-estavel">União Estável</option>
+                        <option value="divorciado">Divorciado(a)</option>
+                        <option value="separado">Separado(a)</option>
+                        <option value="viuvo">Viúvo(a)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="garantia" class="required">Garantia:</label>
+                    <select id="garantia" name="garantia" required>
+                        <option value="">Selecione...</option>
+                        <option value="fiador">Fiador</option>
+                        <option value="seguro-fianca">Seguro Fiança</option>
+                        <option value="capitalizacao">Título de Capitalização</option>
+                        <option value="caucao">Caução</option>
+                    </select>
+                </div>
             </div>
-            <div class="input-group">
-              <label for="cidade_nascimento">Cidade de Nascimento:</label>
-              <input type="text" id="cidade_nascimento" name="cidade_nascimento" />
+        </section>
+
+        <section id="informacoes-pessoais-section" class="hidden">
+            <h2>Informações Pessoais</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="nome-completo" class="required">Nome Completo:</label>
+                    <input type="text" id="nome-completo" name="nome-completo" />
+                </div>
+                <div class="input-group">
+                    <label for="cpf" class="required">CPF:</label>
+                    <input type="text" id="cpf" name="cpf" maxlength="14" placeholder="000.000.000-00" />
+                    <span class="error-message" id="cpf-error"></span>
+                </div>
+                <div class="input-group">
+                    <label for="rg" class="required">RG:</label>
+                    <input type="text" id="rg" name="rg" maxlength="12" placeholder="00.000.000-0" />
+                    <span class="error-message" id="rg-error"></span>
+                </div>
+                <div class="input-group">
+                    <label for="data-nascimento" class="required">Data de Nascimento:</label>
+                    <input type="date" id="data-nascimento" name="data-nascimento" />
+                </div>
+                <div class="input-group">
+                    <label for="nacionalidade">Nacionalidade:</label>
+                    <select id="nacionalidade" name="nacionalidade">
+                        <option value="">Selecione...</option>
+                        <option value="brasileira">Brasileira</option>
+                        <option value="estrangeira">Estrangeira</option>
+                        <option value="dupla">Dupla nacionalidade</option>
+                        <option value="outra">Outra</option>
+                    </select>
+                </div>
+                <div id="nacionalidade-brasileira-group" class="form-grid hidden">
+                    <div class="input-group">
+                        <label for="uf_nascimento">Estado de Nascimento (UF):</label>
+                        <select id="uf_nascimento" name="uf_nascimento">
+                            <option value="">Selecione...</option>
+                            <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option><option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option><option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option><option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option><option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option><option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option><option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option><option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option><option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="cidade_nascimento">Cidade de Nascimento:</label>
+                        <input type="text" id="cidade_nascimento" name="cidade_nascimento" />
+                    </div>
+                </div>
+                <div id="nacionalidade-estrangeira-group" class="form-grid hidden">
+                    <div class="input-group">
+                        <label for="pais_nascimento">País de Nascimento:</label>
+                        <input type="text" id="pais_nascimento" name="pais_nascimento" />
+                    </div>
+                    <div class="input-group">
+                        <label for="cidade_origem">Cidade no País de Origem (Opcional):</label>
+                        <input type="text" id="cidade_origem" name="cidade_origem" />
+                    </div>
+                </div>
+                <div id="nacionalidade-dupla-group" class="form-grid hidden">
+                    <div class="input-group">
+                        <label for="pais_principal">País Principal de Nascimento:</label>
+                        <input type="text" id="pais_principal" name="pais_principal" />
+                    </div>
+                    <div class="input-group">
+                        <label for="cidade_principal">Cidade Principal de Nascimento:</label>
+                        <input type="text" id="cidade_principal" name="cidade_principal" />
+                    </div>
+                    <div class="input-group">
+                        <label for="segundo_pais">Segundo País (Opcional):</label>
+                        <input type="text" id="segundo_pais" name="segundo_pais" />
+                    </div>
+                    <div class="input-group">
+                        <label for="segunda_cidade">Segunda Cidade (Opcional):</label>
+                        <input type="text" id="segunda_cidade" name="segunda_cidade" />
+                    </div>
+                </div>
+                <div id="nacionalidade-outra-group" class="form-grid hidden">
+                    <div class="input-group">
+                        <label for="naturalidade_texto_livre">Informe sua naturalidade:</label>
+                        <input type="text" id="naturalidade_texto_livre" name="naturalidade_texto_livre" />
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="celular" class="required">Celular (WhatsApp):</label>
+                    <input type="tel" id="celular" name="celular" maxlength="15" placeholder="(99) 99999-9999" />
+                    <span class="error-message" id="celular-error"></span>
+                </div>
+                <div class="input-group">
+                    <label for="email" class="required">Email:</label>
+                    <input type="email" id="email" name="email" placeholder="seu.email@exemplo.com" />
+                    <span class="error-message" id="email-error"></span>
+                </div>
             </div>
-          </div>
+        </section>
 
-          <div id="nacionalidade-estrangeira-group" class="form-grid hidden">
-            <div class="input-group">
-              <label for="pais_nascimento">País de Nascimento:</label>
-              <input type="text" id="pais_nascimento" name="pais_nascimento" />
+        <section id="endereco-residencial-section" class="hidden">
+            <h2>Endereço Residencial</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="cep-residencial" class="required">CEP:</label>
+                    <input type="text" id="cep-residencial" name="cep-residencial" maxlength="9" placeholder="00000-000" />
+                    <span class="error-message" id="cep-residencial-error"></span>
+                </div>
+                <div class="input-group">
+                    <label for="logradouro-residencial" class="required">Logradouro:</label>
+                    <input type="text" id="logradouro-residencial" name="logradouro-residencial" />
+                </div>
+                <div class="input-group">
+                    <label for="numero-residencial" class="required">Número:</label>
+                    <input type="text" id="numero-residencial" name="numero-residencial" />
+                </div>
+                <div class="input-group">
+                    <label for="complemento-residencial">Complemento:</label>
+                    <input type="text" id="complemento-residencial" name="complemento-residencial" />
+                </div>
+                <div class="input-group">
+                    <label for="bairro-residencial" class="required">Bairro:</label>
+                    <input type="text" id="bairro-residencial" name="bairro-residencial" />
+                </div>
+                <div class="input-group">
+                    <label for="cidade-residencial" class="required">Cidade:</label>
+                    <input type="text" id="cidade-residencial" name="cidade-residencial" />
+                </div>
+                <div class="input-group">
+                    <label for="estado-residencial" class="required">Estado:</label>
+                    <input type="text" id="estado-residencial" name="estado-residencial" />
+                </div>
             </div>
-            <div class="input-group">
-              <label for="cidade_origem">Cidade no País de Origem (Opcional):</label>
-              <input type="text" id="cidade_origem" name="cidade_origem" />
+        </section>
+
+        <section id="dados-profissionais-section" class="hidden">
+            <h2>Dados Profissionais</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="nome-empresa" class="required">Nome da Empresa:</label>
+                    <input type="text" id="nome-empresa" name="nome-empresa" />
+                </div>
+                <div class="input-group">
+                    <label for="cargo" class="required">Cargo:</label>
+                    <input type="text" id="cargo" name="cargo" />
+                </div>
+                <div class="input-group">
+                    <label for="tempo-empresa" class="required">Tempo de Empresa:</label>
+                    <input type="text" id="tempo-empresa" name="tempo-empresa" />
+                </div>
+                <div class="input-group">
+                    <label for="remuneracao-mensal" class="required">Remuneração Mensal:</label>
+                    <input type="text" id="remuneracao-mensal" name="remuneracao-mensal" />
+                    <span class="error-message" id="remuneracao-mensal-error"></span>
+                </div>
+                <div class="input-group">
+                    <label for="cep-profissional" class="required">CEP Profissional:</label>
+                    <input type="text" id="cep-profissional" name="cep-profissional" maxlength="9" placeholder="00000-000" />
+                    <span class="error-message" id="cep-profissional-error"></span>
+                </div>
+                <div class="input-group">
+                    <label for="logradouro-profissional" class="required">Logradouro Profissional:</label>
+                    <input type="text" id="logradouro-profissional" name="logradouro-profissional" />
+                </div>
+                <div class="input-group">
+                    <label for="numero-profissional" class="required">Número Profissional:</label>
+                    <input type="text" id="numero-profissional" name="numero-profissional" />
+                </div>
+                <div class="input-group">
+                    <label for="complemento-profissional">Complemento Profissional:</label>
+                    <input type="text" id="complemento-profissional" name="complemento-profissional" />
+                </div>
+                <div class="input-group">
+                    <label for="bairro-profissional" class="required">Bairro Profissional:</label>
+                    <input type="text" id="bairro-profissional" name="bairro-profissional" />
+                </div>
+                <div class="input-group">
+                    <label for="cidade-profissional" class="required">Cidade Profissional:</label>
+                    <input type="text" id="cidade-profissional" name="cidade-profissional" />
+                </div>
+                <div class="input-group">
+                    <label for="estado-profissional" class="required">Estado Profissional:</label>
+                    <input type="text" id="estado-profissional" name="estado-profissional" />
+                </div>
             </div>
-          </div>
+        </section>
 
-          <div id="nacionalidade-dupla-group" class="form-grid hidden">
-            <div class="input-group">
-              <label for="pais_principal">País Principal de Nascimento:</label>
-              <input type="text" id="pais_principal" name="pais_principal" />
+        <section id="informacoes-conjuge-section" class="hidden">
+            <h2>Informações do Cônjuge</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="nome-conjuge" class="required">Nome Completo do Cônjuge:</label>
+                    <input type="text" id="nome-conjuge" name="nome-conjuge" />
+                </div>
+                <div class="input-group">
+                    <label for="cpf-conjuge" class="required">CPF do Cônjuge:</label>
+                    <input type="text" id="cpf-conjuge" name="cpf-conjuge" maxlength="14" placeholder="000.000.000-00" />
+                    <span class="error-message" id="cpf-conjuge-error"></span>
+                </div>
+                <div class="input-group">
+                    <label for="rg-conjuge" class="required">RG do Cônjuge:</label>
+                    <input type="text" id="rg-conjuge" name="rg-conjuge" maxlength="12" placeholder="00.000.000-0" />
+                    <span class="error-message" id="rg-conjuge-error"></span>
+                </div>
+                <div class="input-group">
+                    <label for="nascimento-conjuge" class="required">Data de Nascimento do Cônjuge:</label>
+                    <input type="date" id="nascimento-conjuge" name="nascimento-conjuge" />
+                </div>
+                <div class="input-group">
+                    <label for="nacionalidade-conjuge">Nacionalidade do Cônjuge:</label>
+                    <select id="nacionalidade-conjuge" name="nacionalidade-conjuge">
+                        <option value="">Selecione...</option>
+                        <option value="brasileira">Brasileira</option>
+                        <option value="estrangeira">Estrangeira</option>
+                    </select>
+                </div>
+                <div id="nacionalidade-conjuge-brasileira-group" class="form-grid hidden">
+                    <div class="input-group">
+                        <label for="uf_nascimento_conjuge">Estado de Nascimento (UF):</label>
+                        <select id="uf_nascimento_conjuge" name="uf_nascimento_conjuge">
+                            <option value="">Selecione...</option>
+                            <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option><option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option><option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option><option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option><option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option><option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option><option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option><option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option><option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="cidade_nascimento_conjuge">Cidade de Nascimento:</label>
+                        <input type="text" id="cidade_nascimento_conjuge" name="cidade_nascimento_conjuge" />
+                    </div>
+                </div>
+                <div id="nacionalidade-conjuge-estrangeira-group" class="form-grid hidden">
+                    <div class="input-group">
+                        <label for="pais_nascimento_conjuge">País de Nascimento:</label>
+                        <input type="text" id="pais_nascimento_conjuge" name="pais_nascimento_conjuge" />
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="celular-conjuge" class="required">Celular (WhatsApp):</label>
+                    <input type="tel" id="celular-conjuge" name="celular-conjuge" maxlength="15" placeholder="(99) 99999-9999" />
+                    <span class="error-message" id="celular-conjuge-error"></span>
+                </div>
+                <div class="input-group">
+                    <label for="email-conjuge" class="required">Email:</label>
+                    <input type="email" id="email-conjuge" name="email-conjuge" placeholder="seu.email@exemplo.com" />
+                    <span class="error-message" id="email-conjuge-error"></span>
+                </div>
+                <div class="input-group">
+                    <label for="tipo-atividade-conjuge" class="required">Tipo de Atividade do Cônjuge:</label>
+                    <select id="tipo-atividade-conjuge" name="tipo-atividade-conjuge" required>
+                        <option value="">Selecione...</option>
+                        <option value="clt">CLT</option>
+                        <option value="liberal">Profissional Liberal</option>
+                        <option value="empresario">Empresário</option>
+                        <option value="aposentado">Aposentado/Pensionista</option>
+                        <option value="estudante">Estudante</option>
+                        <option value="desempregado">Desempregado</option>
+                        <option value="do-lar">Do Lar</option>
+                    </select>
+                </div>
             </div>
-            <div class="input-group">
-              <label for="cidade_principal">Cidade Principal de Nascimento:</label>
-              <input type="text" id="cidade_principal" name="cidade_principal" />
+        </section>
+
+        <section id="dados-profissionais-conjuge-section" class="hidden">
+            <h2>Dados Profissionais do Cônjuge</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="nome-empresa-conjuge" class="required">Nome da Empresa do Cônjuge:</label>
+                    <input type="text" id="nome-empresa-conjuge" name="nome-empresa-conjuge" />
+                </div>
+                <div class="input-group">
+                    <label for="cargo-conjuge" class="required">Cargo do Cônjuge:</label>
+                    <input type="text" id="cargo-conjuge" name="cargo-conjuge" />
+                </div>
+                <div class="input-group">
+                    <label for="tempo-empresa-conjuge" class="required">Tempo de Empresa do Cônjuge:</label>
+                    <input type="text" id="tempo-empresa-conjuge" name="tempo-empresa-conjuge" />
+                </div>
+                <div class="input-group">
+                    <label for="remuneracao-mensal-conjuge" class="required">Remuneração Mensal do Cônjuge:</label>
+                    <input type="text" id="remuneracao-mensal-conjuge" name="remuneracao-mensal-conjuge" />
+                    <span class="error-message" id="remuneracao-mensal-conjuge-error"></span>
+                </div>
             </div>
-            <div class="input-group">
-              <label for="segundo_pais">Segundo País (Opcional):</label>
-              <input type="text" id="segundo_pais" name="segundo_pais" />
+        </section>
+
+        <section id="informacoes-fiador-section" class="hidden">
+            <h2>Informações do Fiador</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="fiador-nome" class="required">Nome Completo do Fiador:</label>
+                    <input type="text" id="fiador-nome" name="fiador-nome" />
+                </div>
+                <div class="input-group">
+                    <label for="fiador-cpf" class="required">CPF do Fiador:</label>
+                    <input type="text" id="fiador-cpf" name="fiador-cpf" maxlength="14" placeholder="000.000.000-00" />
+                    <span class="error-message" id="fiador-cpf-error"></span>
+                </div>
+                <div class="input-group">
+                    <label for="fiador-rg" class="required">RG do Fiador:</label>
+                    <input type="text" id="fiador-rg" name="fiador-rg" maxlength="12" placeholder="00.000.000-0" />
+                    <span class="error-message" id="fiador-rg-error"></span>
+                </div>
+                <div class="input-group">
+                    <label for="fiador-data-nascimento" class="required">Data de Nascimento do Fiador:</label>
+                    <input type="date" id="fiador-data-nascimento" name="fiador-data-nascimento" />
+                </div>
+                <div class="input-group">
+                    <label for="fiador-nacionalidade">Nacionalidade do Fiador:</label>
+                    <select id="fiador-nacionalidade" name="fiador-nacionalidade">
+                        <option value="">Selecione...</option>
+                        <option value="brasileira">Brasileira</option>
+                        <option value="estrangeira">Estrangeira</option>
+                        <option value="dupla">Dupla nacionalidade</option>
+                        <option value="outra">Outra</option>
+                    </select>
+                </div>
+                <div id="fiador-nacionalidade-brasileira-group" class="form-grid hidden">
+                    <div class="input-group">
+                        <label for="fiador-uf_nascimento">Estado de Nascimento (UF):</label>
+                        <select id="fiador-uf_nascimento" name="fiador-uf_nascimento">
+                            <option value="">Selecione...</option>
+                            <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option><option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option><option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option><option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option><option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option><option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option><option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option><option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option><option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="fiador-cidade_nascimento">Cidade de Nascimento:</label>
+                        <input type="text" id="fiador-cidade_nascimento" name="fiador-cidade_nascimento" />
+                    </div>
+                </div>
+                <div id="fiador-nacionalidade-estrangeira-group" class="form-grid hidden">
+                    <div class="input-group">
+                        <label for="fiador-pais_nascimento">País de Nascimento:</label>
+                        <input type="text" id="fiador-pais_nascimento" name="fiador-pais_nascimento" />
+                    </div>
+                    <div class="input-group">
+                        <label for="fiador-cidade_origem">Cidade no País de Origem (Opcional):</label>
+                        <input type="text" id="fiador-cidade_origem" name="fiador-cidade_origem" />
+                    </div>
+                </div>
+                <div id="fiador-nacionalidade-dupla-group" class="form-grid hidden">
+                    <div class="input-group">
+                        <label for="fiador-pais_principal">País Principal de Nascimento:</label>
+                        <input type="text" id="fiador-pais_principal" name="fiador-pais_principal" />
+                    </div>
+                    <div class="input-group">
+                        <label for="fiador-cidade_principal">Cidade Principal de Nascimento:</label>
+                        <input type="text" id="fiador-cidade_principal" name="fiador-cidade_principal" />
+                    </div>
+                    <div class="input-group">
+                        <label for="fiador-segundo_pais">Segundo País (Opcional):</label>
+                        <input type="text" id="fiador-segundo_pais" name="fiador-segundo_pais" />
+                    </div>
+                    <div class="input-group">
+                        <label for="fiador-segunda_cidade">Segunda Cidade (Opcional):</label>
+                        <input type="text" id="fiador-segunda_cidade" name="fiador-segunda_cidade" />
+                    </div>
+                </div>
+                <div id="fiador-nacionalidade-outra-group" class="form-grid hidden">
+                    <div class="input-group">
+                        <label for="fiador-naturalidade_texto_livre">Informe sua naturalidade:</label>
+                        <input type="text" id="fiador-naturalidade_texto_livre" name="fiador-naturalidade_texto_livre" />
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="fiador-celular" class="required">Celular (WhatsApp) do Fiador:</label>
+                    <input type="tel" id="fiador-celular" name="fiador-celular" maxlength="15" placeholder="(99) 99999-9999" />
+                    <span class="error-message" id="fiador-celular-error"></span>
+                </div>
+                <div class="input-group">
+                    <label for="fiador-email" class="required">Email do Fiador:</label>
+                    <input type="email" id="fiador-email" name="fiador-email" placeholder="seu.email@exemplo.com" />
+                    <span class="error-message" id="fiador-email-error"></span>
+                </div>
             </div>
-            <div class="input-group">
-              <label for="segunda_cidade">Segunda Cidade (Opcional):</label>
-              <input type="text" id="segunda_cidade" name="segunda_cidade" />
+        </section>
+
+        <section id="endereco-fiador-section" class="hidden">
+            <h2>Endereço Residencial do Fiador</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="fiador-cep-residencial" class="required">CEP:</label>
+                    <input type="text" id="fiador-cep-residencial" name="fiador-cep-residencial" maxlength="9" placeholder="00000-000" />
+                    <span class="error-message" id="fiador-cep-residencial-error"></span>
+                </div>
+                <div class="input-group">
+                    <label for="fiador-logradouro-residencial" class="required">Logradouro:</label>
+                    <input type="text" id="fiador-logradouro-residencial" name="fiador-logradouro-residencial" />
+                </div>
+                <div class="input-group">
+                    <label for="fiador-numero-residencial" class="required">Número:</label>
+                    <input type="text" id="fiador-numero-residencial" name="fiador-numero-residencial" />
+                </div>
+                <div class="input-group">
+                    <label for="fiador-complemento-residencial">Complemento:</label>
+                    <input type="text" id="fiador-complemento-residencial" name="fiador-complemento-residencial" />
+                </div>
+                <div class="input-group">
+                    <label for="fiador-bairro-residencial" class="required">Bairro:</label>
+                    <input type="text" id="fiador-bairro-residencial" name="fiador-bairro-residencial" />
+                </div>
+                <div class="input-group">
+                    <label for="fiador-cidade-residencial" class="required">Cidade:</label>
+                    <input type="text" id="fiador-cidade-residencial" name="fiador-cidade-residencial" />
+                </div>
+                <div class="input-group">
+                    <label for="fiador-estado-residencial" class="required">Estado:</label>
+                    <input type="text" id="fiador-estado-residencial" name="fiador-estado-residencial" />
+                </div>
             </div>
-          </div>
+        </section>
 
-          <div id="nacionalidade-outra-group" class="form-grid hidden">
-            <div class="input-group">
-              <label for="naturalidade_texto_livre">Informe sua naturalidade:</label>
-              <input type="text" id="naturalidade_texto_livre" name="naturalidade_texto_livre" />
+        <section id="dados-profissionais-fiador-section" class="hidden">
+            <h2>Dados Profissionais do Fiador</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="fiador-nome-empresa" class="required">Nome da Empresa do Fiador:</label>
+                    <input type="text" id="fiador-nome-empresa" name="fiador-nome-empresa" />
+                </div>
+                <div class="input-group">
+                    <label for="fiador-cargo" class="required">Cargo do Fiador:</label>
+                    <input type="text" id="fiador-cargo" name="fiador-cargo" />
+                </div>
+                <div class="input-group">
+                    <label for="fiador-tempo-empresa" class="required">Tempo de Empresa do Fiador:</label>
+                    <input type="text" id="fiador-tempo-empresa" name="fiador-tempo-empresa" />
+                </div>
+                <div class="input-group">
+                    <label for="fiador-remuneracao-mensal" class="required">Remuneração Mensal do Fiador:</label>
+                    <input type="text" id="fiador-remuneracao-mensal" name="fiador-remuneracao-mensal" />
+                    <span class="error-message" id="fiador-remuneracao-mensal-error"></span>
+                </div>
             </div>
-          </div>
-          <!-- Fim dos Campos Condicionais para Nacionalidade -->
+        </section>
 
-          <div class="input-group">
-            <label for="celular" class="required">Celular (WhatsApp):</label>
-            <input type="tel" id="celular" name="celular" maxlength="15" placeholder="(99) 99999-9999" />
-            <span class="error-message" id="celular-error"></span>
-          </div>
-          <div class="input-group">
-            <label for="email" class="required">Email:</label>
-            <input type="email" id="email" name="email" placeholder="seu.email@exemplo.com" />
-            <span class="error-message" id="email-error"></span>
-          </div>
-        </div>
-      </section>
+        <section id="documentos-section" class="hidden">
+            <h2>Documentos Necessários para Análise</h2>
+            <div id="documentos-container" class="form-grid">
+                <div class="file-input-group">
+                    <label for="cnh-locatario-file" class="file-label required">CNH do Locatário</label>
+                    <span class="file-info">Tamanho máximo: 5MB. Formatos: PDF, JPG, PNG.</span>
+                    <div class="file-container">
+                        <label for="cnh-locatario-file" class="file-button-label" id="cnh-locatario-button">
+                            <i class="fas fa-paperclip"></i> Anexar
+                        </label>
+                        <span class="file-name" id="cnh-locatario-name">Nenhum arquivo</span>
+                        <button type="button" class="remove-file-btn" id="cnh-locatario-remove">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    </div>
+                    <input type="file" id="cnh-locatario-file" name="cnh_locatario" accept=".pdf,.jpg,.jpeg,.png" />
+                </div>
 
-      <section id="endereco-residencial-section" class="hidden">
-        <h2>Endereço Residencial</h2>
-        <div class="form-grid">
-          <div class="input-group">
-            <label for="cep-residencial" class="required">CEP:</label>
-            <input type="text" id="cep-residencial" name="cep-residencial" maxlength="9" placeholder="00000-000" />
-            <span class="error-message" id="cep-residencial-error"></span>
-          </div>
-          <div class="input-group">
-            <label for="logradouro-residencial" class="required">Logradouro:</label>
-            <input type="text" id="logradouro-residencial" name="logradouro-residencial" readonly />
-          </div>
-          <div class="input-group">
-            <label for="numero-residencial" class="required">Número:</label>
-            <input type="text" id="numero-residencial" name="numero-residencial" />
-          </div>
-          <div class="input-group">
-            <label for="complemento-residencial">Complemento:</label>
-            <input type="text" id="complemento-residencial" name="complemento-residencial" />
-          </div>
-          <div class="input-group">
-            <label for="bairro-residencial" class="required">Bairro:</label>
-            <input type="text" id="bairro-residencial" name="bairro-residencial" readonly />
-          </div>
-          <div class="input-group">
-            <label for="cidade-residencial" class="required">Cidade:</label>
-            <input type="text" id="cidade-residencial" name="cidade-residencial" readonly />
-          </div>
-          <div class="input-group">
-            <label for="estado-residencial" class="required">Estado:</label>
-            <input type="text" id="estado-residencial" name="estado-residencial" readonly />
-          </div>
-        </div>
-      </section>
+                <div class="file-input-group">
+                    <label for="comp-residencia-file" class="file-label required">Comprovante de Residência</label>
+                    <span class="file-info">Tamanho máximo: 5MB. Formatos: PDF, JPG, PNG.</span>
+                    <div class="file-container">
+                        <label for="comp-residencia-file" class="file-button-label" id="comp-residencia-button">
+                            <i class="fas fa-paperclip"></i> Anexar
+                        </label>
+                        <span class="file-name" id="comp-residencia-name">Nenhum arquivo</span>
+                        <button type="button" class="remove-file-btn" id="comp-residencia-remove">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    </div>
+                    <input type="file" id="comp-residencia-file" name="comp_residencia" accept=".pdf,.jpg,.jpeg,.png" />
+                </div>
 
-      <section id="dados-profissionais-section" class="hidden">
-        <h2>Dados Profissionais</h2>
-        <div class="form-grid">
-          <div class="input-group">
-            <label for="nome-empresa" class="required">Nome da Empresa:</label>
-            <input type="text" id="nome-empresa" name="nome-empresa" />
-          </div>
-          <div class="input-group">
-            <label for="cargo" class="required">Cargo:</label>
-            <input type="text" id="cargo" name="cargo" />
-          </div>
-          <div class="input-group">
-            <label for="remuneracao-mensal" class="required">Remuneração Mensal:</label>
-            <input type="text" id="remuneracao-mensal" name="remuneracao-mensal" placeholder="R$ 0,00" />
-          </div>
-          <div class="input-group">
-            <label for="cep-profissional" class="required">CEP Profissional:</label>
-            <input type="text" id="cep-profissional" name="cep-profissional" maxlength="9" placeholder="00000-000" />
-            <span class="error-message" id="cep-profissional-error"></span>
-          </div>
-          <div class="input-group">
-            <label for="logradouro-profissional" class="required">Logradouro Profissional:</label>
-            <input type="text" id="logradouro-profissional" name="logradouro-profissional" readonly />
-          </div>
-          <div class="input-group">
-            <label for="numero-profissional" class="required">Número Profissional:</label>
-            <input type="text" id="numero-profissional" name="numero-profissional" />
-          </div>
-          <div class="input-group">
-            <label for="complemento-profissional">Complemento Profissional:</label>
-            <input type="text" id="complemento-profissional" name="complemento-profissional" />
-          </div>
-          <div class="input-group">
-            <label for="bairro-profissional" class="required">Bairro Profissional:</label>
-            <input type="text" id="bairro-profissional" name="bairro-profissional" readonly />
-          </div>
-          <div class="input-group">
-            <label for="cidade-profissional" class="required">Cidade Profissional:</label>
-            <input type="text" id="cidade-profissional" name="cidade-profissional" readonly />
-          </div>
-          <div class="input-group">
-            <label for="estado-profissional" class="required">Estado Profissional:</label>
-            <input type="text" id="estado-profissional" name="estado-profissional" readonly />
-          </div>
-        </div>
-      </section>
+                <div class="file-input-group">
+                    <label for="crlv-file" class="file-label required">CRLV do Veículo</label>
+                    <span class="file-info">Tamanho máximo: 5MB. Formatos: PDF, JPG, PNG.</span>
+                    <div class="file-container">
+                        <label for="crlv-file" class="file-button-label" id="crlv-button">
+                            <i class="fas fa-paperclip"></i> Anexar
+                        </label>
+                        <span class="file-name" id="crlv-name">Nenhum arquivo</span>
+                        <button type="button" class="remove-file-btn" id="crlv-remove">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    </div>
+                    <input type="file" id="crlv-file" name="crlv" accept=".pdf,.jpg,.jpeg,.png" />
+                </div>
 
-      <section id="informacoes-fiador-section" class="hidden">
-        <h2>Informações Pessoais do Fiador</h2>
-        <div class="form-grid">
-          <div class="input-group">
-            <label for="fiador-nome-completo" class="required">Nome Completo do Fiador:</label>
-            <input type="text" id="fiador-nome-completo" name="fiador-nome-completo" />
-          </div>
-          <div class="input-group">
-            <label for="fiador-cpf" class="required">CPF do Fiador:</label>
-            <input type="text" id="fiador-cpf" name="fiador-cpf" maxlength="14" placeholder="000.000.000-00" />
-            <span class="error-message" id="fiador-cpf-error"></span>
-          </div>
-          <div class="input-group">
-            <label for="fiador-rg" class="required">RG do Fiador:</label>
-            <input type="text" id="fiador-rg" name="fiador-rg" maxlength="12" placeholder="00.000.000-0" />
-            <span class="error-message" id="fiador-rg-error"></span>
-          </div>
-          <div class="input-group">
-            <label for="fiador-celular" class="required">Celular do Fiador (WhatsApp):</label>
-            <input type="tel" id="fiador-celular" name="fiador-celular" maxlength="15" placeholder="(99) 99999-9999" />
-            <span class="error-message" id="fiador-celular-error"></span>
-          </div>
-          <div class="input-group">
-            <label for="fiador-email" class="required">Email do Fiador:</label>
-            <input type="email" id="fiador-email" name="fiador-email" placeholder="fiador.email@exemplo.com" />
-            <span class="error-message" id="fiador-email-error"></span>
-          </div>
-          <div class="input-group">
-            <label for="fiador-remuneracao-mensal" class="required">Remuneração Mensal do Fiador:</label>
-            <input type="text" id="fiador-remuneracao-mensal" name="fiador-remuneracao-mensal" placeholder="R$ 0,00" />
-          </div>
-        </div>
-      </section>
+                <div class="file-input-group">
+                    <label for="foto-veiculo-file" class="file-label required">Foto do Veículo</label>
+                    <span class="file-info">Tamanho máximo: 10MB. Formatos: JPG, PNG.</span>
+                    <div class="file-container">
+                        <label for="foto-veiculo-file" class="file-button-label" id="foto-veiculo-button">
+                            <i class="fas fa-paperclip"></i> Anexar
+                        </label>
+                        <span class="file-name" id="foto-veiculo-name">Nenhum arquivo</span>
+                        <button type="button" class="remove-file-btn" id="foto-veiculo-remove">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    </div>
+                    <input type="file" id="foto-veiculo-file" name="foto_veiculo" accept=".jpg,.jpeg,.png" />
+                </div>
+            </div>
+        </section>
 
-      <section id="endereco-fiador-section" class="hidden">
-        <h2>Endereço Residencial do Fiador</h2>
-        <div class="form-grid">
-          <div class="input-group">
-            <label for="cep-fiador-residencial" class="required">CEP do Fiador:</label>
-            <input type="text" id="cep-fiador-residencial" name="fiador-cep-residencial" maxlength="9" placeholder="00000-000" />
-            <span class="error-message" id="cep-fiador-residencial-error"></span>
-          </div>
-          <div class="input-group">
-            <label for="logradouro-fiador-residencial" class="required">Logradouro do Fiador:</label>
-            <input type="text" id="logradouro-fiador-residencial" name="fiador-logradouro-residencial" readonly />
-          </div>
-          <div class="input-group">
-            <label for="numero-fiador-residencial" class="required">Número do Fiador:</label>
-            <input type="text" id="numero-fiador-residencial" name="fiador-numero-residencial" />
-          </div>
-          <div class="input-group">
-            <label for="complemento-fiador-residencial">Complemento do Fiador:</label>
-            <input type="text" id="complemento-fiador-residencial" name="fiador-complemento-residencial" />
-          </div>
-          <div class="input-group">
-            <label for="bairro-fiador-residencial" class="required">Bairro do Fiador:</label>
-            <input type="text" id="bairro-fiador-residencial" name="fiador-bairro-residencial" readonly />
-          </div>
-          <div class="input-group">
-            <label for="cidade-fiador-residencial" class="required">Cidade do Fiador:</label>
-            <input type="text" id="cidade-fiador-residencial" name="fiador-cidade-residencial" readonly />
-          </div>
-          <div class="input-group">
-            <label for="estado-fiador-residencial" class="required">Estado do Fiador:</label>
-            <input type="text" id="estado-fiador-residencial" name="fiador-estado-residencial" readonly />
-          </div>
-        </div>
-      </section>
-
-      <section id="dados-profissionais-fiador-section" class="hidden">
-        <h2>Dados Profissionais do Fiador</h2>
-        <div class="form-grid">
-          <div class="input-group">
-            <label for="fiador-nome-empresa" class="required">Nome da Empresa do Fiador:</label>
-            <input type="text" id="fiador-nome-empresa" name="fiador-nome-empresa" />
-          </div>
-          <div class="input-group">
-            <label for="fiador-cargo" class="required">Cargo do Fiador:</label>
-            <input type="text" id="fiador-cargo" name="fiador-cargo" />
-          </div>
-          <div class="input-group">
-            <label for="fiador-cep-profissional" class="required">CEP Profissional do Fiador:</label>
-            <input type="text" id="fiador-cep-profissional" name="fiador-cep-profissional" maxlength="9" placeholder="00000-000" />
-            <span class="error-message" id="fiador-cep-profissional-error"></span>
-          </div>
-          <div class="input-group">
-            <label for="fiador-logradouro-profissional" class="required">Logradouro Profissional do Fiador:</label>
-            <input type="text" id="fiador-logradouro-profissional" name="fiador-logradouro-profissional" readonly />
-          </div>
-          <div class="input-group">
-            <label for="fiador-numero-profissional" class="required">Número Profissional do Fiador:</label>
-            <input type="text" id="fiador-numero-profissional" name="fiador-numero-profissional" />
-          </div>
-          <div class="input-group">
-            <label for="complemento-profissional">Complemento Profissional do Fiador:</label>
-            <input type="text" id="fiador-complemento-profissional" name="fiador-complemento-profissional" />
-          </div>
-          <div class="input-group">
-            <label for="fiador-bairro-profissional" class="required">Bairro Profissional do Fiador:</label>
-            <input type="text" id="fiador-bairro-profissional" name="fiador-bairro-profissional" readonly />
-          </div>
-          <div class="input-group">
-            <label for="fiador-cidade-profissional" class="required">Cidade Profissional do Fiador:</label>
-            <input type="text" id="fiador-cidade-profissional" name="fiador-cidade-profissional" readonly />
-          </div>
-          <div class="input-group">
-            <label for="fiador-estado-profissional" class="required">Estado Profissional do Fiador:</label>
-            <input type="text" id="fiador-estado-profissional" name="fiador-estado-profissional" readonly />
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <h2>Documentos para Anexo</h2>
-        <div class="form-grid" id="documentos-container">
-          </div>
-      </section>
-
-      <button type="submit">Enviar Ficha Cadastral</button>
+        <div id="alert-container"></div>
+        <button type="submit" id="submit-button">Enviar Ficha de Locação</button>
     </form>
-  </main>
+</main>
 
-  <div class="loading-overlay" id="loading-overlay">
+<div id="loading-overlay" class="loading-overlay">
     <div class="loading-spinner"></div>
-    <p class="loading-message">O envio está sendo processado...</p>
-  </div>
+    <div class="loading-message">Enviando Ficha...</div>
+</div>
 
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>

@@ -8,39 +8,29 @@ const estadoCivil = document.getElementById("estado-civil");
 const tipoLocacao = document.getElementById("tipo-locacao");
 const garantia = document.getElementById("garantia");
 const documentosContainer = document.getElementById("documentos-container");
-const loadingOverlay = document.getElementById('loading-overlay'); // Elemento do overlay de carregamento
+const loadingOverlay = document.getElementById('loading-overlay');
 
-// Seções principais do locatário (também sempre existem, mas podem ser hidden/shown)
+// Seções principais do locatário
 const informacoesPessoaisSection = document.getElementById("informacoes-pessoais-section");
 const enderecoResidencialSection = document.getElementById("endereco-residencial-section");
 const dadosProfissionaisSection = document.getElementById("dados-profissionais-section");
 
-// Seções do fiador (também sempre existem, mas podem ser hidden/shown)
+// Seções do fiador
 const informacoesFiadorSection = document.getElementById("informacoes-fiador-section");
 const enderecoFiadorSection = document.getElementById("endereco-fiador-section");
 const dadosProfissionaisFiadorSection = document.getElementById("dados-profissionais-fiador-section");
 
-// Novos elementos para a lógica de Nacionalidade
+// Elementos para a lógica de Nacionalidade
 const nacionalidadeSelect = document.getElementById('nacionalidade');
 const nacionalidadeBrasileiraGroup = document.getElementById('nacionalidade-brasileira-group');
 const nacionalidadeEstrangeiraGroup = document.getElementById('nacionalidade-estrangeira-group');
 const nacionalidadeDuplaGroup = document.getElementById('nacionalidade-dupla-group');
 const nacionalidadeOutraGroup = document.getElementById('nacionalidade-outra-group');
 
-// IDs dos campos que SÃO OPCIONAIS (não obrigatórios) por padrão
-const optionalFieldIds = [
-    'complemento-residencial',
-    'complemento-profissional',
-    'fiador-complemento-residencial',
-    'fiador-complemento-profissional'
-    // 'nacionalidade' e 'naturalidade' foram removidos daqui, pois sua obrigatoriedade é dinâmica
-];
-
 // --- Funções de Utilitário ---
 
 // Limpa os campos de endereço
 function clearAddressFields(type) {
-    // Busca os elementos de endereço dinamicamente com base no 'type'
     const logradouroInput = document.getElementById("logradouro-" + type);
     const bairroInput = document.getElementById("bairro-" + type);
     const cidadeInput = document.getElementById("cidade-" + type);
@@ -60,26 +50,22 @@ async function consultarCep(inputElement, type) {
     const cleanCep = cep.replace(/\D/g, '');
 
     if (cleanCep.length !== 8) {
-        // Limpa e sai se o CEP não tem 8 dígitos
         clearAddressFields(type);
         return;
     }
 
-    // Busca os elementos de endereço e erro dinamicamente
     const logradouroInput = document.getElementById("logradouro-" + type);
     const bairroInput = document.getElementById("bairro-" + type);
     const cidadeInput = document.getElementById("cidade-" + type);
     const estadoInput = document.getElementById("estado-" + type);
     const cepErrorSpan = document.getElementById("cep-" + type + "-error");
 
-    // Pre-limpa os campos e erros antes da consulta para evitar dados antigos
     if (logradouroInput) logradouroInput.value = "";
     if (bairroInput) bairroInput.value = "";
     if (cidadeInput) cidadeInput.value = "";
     if (estadoInput) estadoInput.value = "";
     if (cepErrorSpan) cepErrorSpan.textContent = "Buscando...";
     if (inputElement) inputElement.classList.remove('error-border');
-
 
     try {
         const viaCepResponse = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
@@ -91,7 +77,7 @@ async function consultarCep(inputElement, type) {
             if (cidadeInput) cidadeInput.value = data.localidade;
             if (estadoInput) estadoInput.value = data.uf;
             if (cepErrorSpan) cepErrorSpan.textContent = "";
-            return; // Sai se ViaCEP for bem-sucedido
+            return;
         } else {
             throw new Error("ViaCEP falhou ou CEP não encontrado.");
         }
@@ -107,7 +93,7 @@ async function consultarCep(inputElement, type) {
                 if (cidadeInput) cidadeInput.value = data.city;
                 if (estadoInput) estadoInput.value = data.state;
                 if (cepErrorSpan) cepErrorSpan.textContent = "";
-                return; // Sai se Brasil API for bem-sucedido
+                return;
             } else {
                 throw new Error("Brasil API também falhou ou CEP não encontrado.");
             }
@@ -115,12 +101,12 @@ async function consultarCep(inputElement, type) {
             console.error("Erro ao consultar CEP em ambas as APIs:", brasilApiError.message);
             if (cepErrorSpan) cepErrorSpan.textContent = "CEP inválido ou não encontrado.";
             if (inputElement) inputElement.classList.add('error-border');
-            clearAddressFields(type); // Limpa os campos em caso de erro
+            clearAddressFields(type);
         }
     }
 }
 
-// Formata CEP (00000-000)
+// Formata CEP
 function formatCepInput(inputElement) {
     let value = inputElement.value.replace(/\D/g, '');
     if (value.length > 5) {
@@ -129,7 +115,7 @@ function formatCepInput(inputElement) {
     inputElement.value = value;
 }
 
-// Formata CPF (000.000.000-00) e valida
+// Formata e valida CPF
 function formatCPFInput(inputElement) {
     let value = inputElement.value.replace(/\D/g, '');
     if (value.length > 11) value = value.substring(0, 11);
@@ -163,10 +149,10 @@ function validateCPF(cpf) {
 
 function handleCpfInput(inputElement) {
     formatCPFInput(inputElement);
-    const errorElement = inputElement.parentNode.querySelector('.error-message'); // Busca o erro dinamicamente
+    const errorElement = inputElement.parentNode.querySelector('.error-message');
     const cleanedCpf = inputElement.value.replace(/\D/g, '');
 
-    if (errorElement) { // Garante que o span de erro existe
+    if (errorElement) {
         if (cleanedCpf.length === 11) {
             if (validateCPF(cleanedCpf)) {
                 errorElement.textContent = "";
@@ -185,7 +171,7 @@ function handleCpfInput(inputElement) {
     }
 }
 
-// Formata RG (00.000.000-0)
+// Formata e valida RG
 function handleRgInput(inputElement) {
     let value = inputElement.value.replace(/\D/g, '');
     if (value.length > 8) {
@@ -197,10 +183,10 @@ function handleRgInput(inputElement) {
     }
     inputElement.value = value;
 
-    const errorElement = inputElement.parentNode.querySelector('.error-message'); // Busca o erro dinamicamente
+    const errorElement = inputElement.parentNode.querySelector('.error-message');
     const cleanedRg = inputElement.value.replace(/\D/g, '');
 
-    if (errorElement) { // Garante que o span de erro existe
+    if (errorElement) {
         if (cleanedRg.length > 0 && cleanedRg.length < 7) {
             errorElement.textContent = "RG incompleto";
             inputElement.classList.add('error-border');
@@ -211,7 +197,7 @@ function handleRgInput(inputElement) {
     }
 }
 
-// Formata Telefone ((99) 99999-9999)
+// Formata e valida Telefone
 function formatPhoneInput(inputElement) {
     let value = inputElement.value.replace(/\D/g, '');
     if (value.length > 11) value = value.substring(0, 11);
@@ -232,10 +218,10 @@ function validatePhone(phoneNumber) {
 }
 
 function handlePhoneInput(inputElement) {
-    formatPhoneInput(inputElement); // Aplica a formatação
-    const errorElement = inputElement.parentNode.querySelector('.error-message'); // Busca o erro dinamicamente
+    formatPhoneInput(inputElement);
+    const errorElement = inputElement.parentNode.querySelector('.error-message');
 
-    if (errorElement) { // Garante que o span de erro existe
+    if (errorElement) {
         if (inputElement.value.length > 0 && !validatePhone(inputElement.value)) {
             errorElement.textContent = "Número de celular inválido";
             inputElement.classList.add('error-border');
@@ -246,16 +232,15 @@ function handlePhoneInput(inputElement) {
     }
 }
 
-// Valida formato de e-mail
+// Valida e-mail
 function validateEmail(email) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
 }
 
 function handleEmailInput(inputElement) {
-    const errorElement = inputElement.parentNode.querySelector('.error-message'); // Busca o erro dinamicamente
-
-    if (errorElement) { // Garante que o span de erro existe
+    const errorElement = inputElement.parentNode.querySelector('.error-message');
+    if (errorElement) {
         if (inputElement.value.length > 0 && !validateEmail(inputElement.value)) {
             errorElement.textContent = "Formato de e-mail inválido";
             inputElement.classList.add('error-border');
@@ -266,112 +251,89 @@ function handleEmailInput(inputElement) {
     }
 }
 
-// Formata valores monetários (R$ 0.000,00) com máscara automática e casas decimais dinâmicas
+// Formata valores monetários
 function formatCurrencyInput(inputElement) {
-    let value = inputElement.value.replace(/\D/g, ''); // Remove todos os não-dígitos
-
+    let value = inputElement.value.replace(/\D/g, '');
     if (value === '') {
-        inputElement.value = ''; // Limpa o campo se não houver dígitos
+        inputElement.value = '';
         inputElement.classList.remove('error-border');
         return;
     }
-
-    // Garante que o valor tenha pelo menos 2 dígitos para as casas decimais (Ex: "5" vira "05")
     while (value.length < 2) {
         value = '0' + value;
     }
-
-    // Adiciona o ponto decimal antes dos últimos dois dígitos para representar os centavos
-    // Ex: "12345" vira "123.45", "05" vira "0.05"
     let numberValue = parseFloat(value.slice(0, -2) + '.' + value.slice(-2));
-
-    // Formata o número como moeda brasileira
     inputElement.value = numberValue.toLocaleString('pt-BR', {
         style: 'currency',
         currency: 'BRL',
-        minimumFractionDigits: 2, // Garante sempre duas casas decimais
-        maximumFractionDigits: 2  // Impede mais de duas casas decimais
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
     });
-    inputElement.classList.remove('error-border'); // Remove a borda de erro se o valor for válido
+    inputElement.classList.remove('error-border');
 }
 
 // --- Lógica de Exibição Dinâmica das Seções e Documentos ---
 
-// Nova função para habilitar/desabilitar inputs em uma seção
 function toggleSectionInputs(section, enable) {
     section.querySelectorAll('input, select, textarea').forEach(input => {
-        // Exclui os selects da seleção inicial, pois eles controlam a lógica de exibição
-        if (input.id !== 'tipo-locacao' && input.id !== 'tipo-pessoa' && input.id !== 'tipo-atividade' && input.id !== 'estado-civil' && input.id !== 'garantia' && input.id !== 'nacionalidade') {
-            input.disabled = !enable;
-            // Limpa o valor e o estado de erro quando o campo é desabilitado
-            if (!enable) {
-                input.value = '';
-                input.classList.remove('error-border');
-                input.removeAttribute('required'); // Remove o atributo required
-                const errorSpan = input.parentNode.querySelector('.error-message');
-                if (errorSpan) {
-                    errorSpan.textContent = '';
-                }
+        if (['tipo-locacao', 'tipo-pessoa', 'tipo-atividade', 'estado-civil', 'garantia', 'nacionalidade'].includes(input.id)) {
+            return;
+        }
+        input.disabled = !enable;
+        if (!enable) {
+            input.value = '';
+            input.classList.remove('error-border');
+            input.removeAttribute('required');
+            const errorSpan = input.parentNode.querySelector('.error-message');
+            if (errorSpan) {
+                errorSpan.textContent = '';
             }
         }
     });
 }
 
-// Função para esconder e limpar todos os grupos de nacionalidade
 function hideAllNacionalidadeGroups() {
     [nacionalidadeBrasileiraGroup, nacionalidadeEstrangeiraGroup, nacionalidadeDuplaGroup, nacionalidadeOutraGroup].forEach(group => {
         group.classList.add('hidden');
-        toggleSectionInputs(group, false); // Desabilita e limpa os campos do grupo
+        toggleSectionInputs(group, false);
     });
 }
 
-// Função para exibir os campos de nacionalidade e definir obrigatoriedade
 function toggleNacionalidadeFields() {
-    hideAllNacionalidadeGroups(); // Esconde e limpa todos antes de mostrar o correto
-
+    hideAllNacionalidadeGroups();
     const selectedNacionalidade = nacionalidadeSelect.value;
-
     switch (selectedNacionalidade) {
         case 'brasileira':
             nacionalidadeBrasileiraGroup.classList.remove('hidden');
             toggleSectionInputs(nacionalidadeBrasileiraGroup, true);
-            // Campos obrigatórios para Brasileira
             document.getElementById('uf_nascimento').setAttribute('required', 'true');
             document.getElementById('cidade_nascimento').setAttribute('required', 'true');
             break;
         case 'estrangeira':
             nacionalidadeEstrangeiraGroup.classList.remove('hidden');
             toggleSectionInputs(nacionalidadeEstrangeiraGroup, true);
-            // Campos obrigatórios para Estrangeira
             document.getElementById('pais_nascimento').setAttribute('required', 'true');
-            // Cidade no País de Origem é opcional, então não setamos 'required'
             document.getElementById('cidade_origem').removeAttribute('required');
             break;
         case 'dupla':
             nacionalidadeDuplaGroup.classList.remove('hidden');
             toggleSectionInputs(nacionalidadeDuplaGroup, true);
-            // Campos obrigatórios para Dupla Nacionalidade
             document.getElementById('pais_principal').setAttribute('required', 'true');
             document.getElementById('cidade_principal').setAttribute('required', 'true');
-            // Segundo País e Segunda Cidade são opcionais
             document.getElementById('segundo_pais').removeAttribute('required');
             document.getElementById('segunda_cidade').removeAttribute('required');
             break;
         case 'outra':
             nacionalidadeOutraGroup.classList.remove('hidden');
             toggleSectionInputs(nacionalidadeOutraGroup, true);
-            // Campo obrigatório para Outra
             document.getElementById('naturalidade_texto_livre').setAttribute('required', 'true');
             break;
         default:
-            // Se "Selecione..." ou vazio, todos ficam escondidos e não obrigatórios
             break;
     }
 }
 
-
 function resetPjLabels() {
-    // Labels do Locatário/Sócio/Representante
     document.querySelector('label[for="nome-completo"]').textContent = 'Nome Completo';
     document.querySelector('label[for="cpf"]').textContent = 'CPF';
     document.querySelector('label[for="rg"]').textContent = 'RG';
@@ -379,8 +341,6 @@ function resetPjLabels() {
     document.querySelector('label[for="celular"]').textContent = 'Celular (WhatsApp)';
     document.querySelector('label[for="email"]').textContent = 'Email';
     document.querySelector('label[for="cep-residencial"]').textContent = 'CEP';
-
-    // Labels da Empresa/Profissional (locatário)
     document.querySelector('label[for="nome-empresa"]').textContent = 'Nome da Empresa';
     document.querySelector('label[for="cargo"]').textContent = 'Cargo';
     document.querySelector('label[for="remuneracao-mensal"]').textContent = 'Remuneração Mensal';
@@ -391,8 +351,6 @@ function resetPjLabels() {
     document.querySelector('label[for="bairro-profissional"]').textContent = 'Bairro Profissional';
     document.querySelector('label[for="cidade-profissional"]').textContent = 'Cidade Profissional';
     document.querySelector('label[for="estado-profissional"]').textContent = 'Estado Profissional';
-
-    // Títulos das Seções
     informacoesPessoaisSection.querySelector('h2').textContent = 'Informações Pessoais';
     enderecoResidencialSection.querySelector('h2').textContent = 'Endereço Residencial';
     dadosProfissionaisSection.querySelector('h2').textContent = 'Dados Profissionais';
@@ -400,7 +358,6 @@ function resetPjLabels() {
 
 function atualizarDocumentos() {
     documentosContainer.innerHTML = "";
-    // Esconder todas as seções e desabilitar seus inputs inicialmente
     informacoesPessoaisSection.classList.add("hidden");
     toggleSectionInputs(informacoesPessoaisSection, false);
     enderecoResidencialSection.classList.add("hidden");
@@ -413,13 +370,12 @@ function atualizarDocumentos() {
     toggleSectionInputs(enderecoFiadorSection, false);
     dadosProfissionaisFiadorSection.classList.add("hidden");
     toggleSectionInputs(dadosProfissionaisFiadorSection, false);
+    document.getElementById("informacoes-conjuge-section").classList.add("hidden");
+    toggleSectionInputs(document.getElementById("informacoes-conjuge-section"), false);
+    document.getElementById("dados-profissionais-conjuge-section").classList.add("hidden");
+    toggleSectionInputs(document.getElementById("dados-profissionais-conjuge-section"), false);
 
-    const filtrosPreenchidos =
-        tipoLocacao.value &&
-        tipoPessoa.value &&
-        tipoAtividade.value &&
-        estadoCivil.value &&
-        garantia.value;
+    const filtrosPreenchidos = tipoLocacao.value && tipoPessoa.value && tipoAtividade.value && estadoCivil.value && garantia.value;
 
     if (!filtrosPreenchidos) {
         resetPjLabels();
@@ -446,7 +402,7 @@ function atualizarDocumentos() {
         toggleSectionInputs(dadosProfissionaisSection, true);
 
         if (isPessoaFisica) {
-            resetPjLabels(); // Garante que labels de PJ não fiquem ativas
+            resetPjLabels();
             if (isCLT) {
                 docs.push(
                     "RG do Locatário(a)",
@@ -478,59 +434,54 @@ function atualizarDocumentos() {
                 docs.push(
                     "RG do Locatário(a)",
                     "CPF do Locatário(a)",
-                    "Comprovante de Matrícula/Vínculo com a Instituição de Ensino",
+                    "Comprovante de renda familiar",
                     "Comprovante de residência atual"
                 );
             }
-
-            if (estadoCivilCasadoUniaoEstavel) {
-                docs.push(
-                    "RG do Cônjuge",
-                    "CPF do Cônjuge",
-                    "Comprovante de Renda Cônjuge",
-                    "Declaração de IR Cônjuge"
-                );
-            }
         } else if (isPessoaJuridica) {
-            // Ajusta labels para PJ
-            informacoesPessoaisSection.querySelector('h2').textContent = 'Informações do Sócio/Representante';
-            enderecoResidencialSection.querySelector('h2').textContent = 'Endereço do Sócio/Representante';
-            dadosProfissionaisSection.querySelector('h2').textContent = 'Dados Profissionais da Empresa';
-
-            document.querySelector('label[for="nome-completo"]').textContent = 'Nome Completo do Sócio/Representante';
+            docs.push(
+                "Contrato Social da Empresa e Última Alteração Contratual Consolidada",
+                "CNPJ",
+                "Comprovante de Faturamento (DRE - Declaração de Renda e Despesas)",
+                "Documentos dos Sócios (RG e CPF)",
+                "Declaração de IR da Empresa",
+                "Comprovante de endereço da empresa"
+            );
+            document.querySelector('label[for="nome-completo"]').textContent = 'Nome do Sócio/Representante';
             document.querySelector('label[for="cpf"]').textContent = 'CPF do Sócio/Representante';
             document.querySelector('label[for="rg"]').textContent = 'RG do Sócio/Representante';
             document.querySelector('label[for="data-nascimento"]').textContent = 'Data de Nascimento do Sócio/Representante';
             document.querySelector('label[for="celular"]').textContent = 'Celular do Sócio/Representante';
             document.querySelector('label[for="email"]').textContent = 'Email do Sócio/Representante';
             document.querySelector('label[for="cep-residencial"]').textContent = 'CEP Residencial do Sócio/Representante';
-
-            document.querySelector('label[for="nome-empresa"]').textContent = 'Razão Social da Empresa';
-            document.querySelector('label[for="cargo"]').textContent = 'Área de Atuação da Empresa';
-            document.querySelector('label[for="remuneracao-mensal"]').textContent = 'Faturamento Mensal da Empresa';
-            document.querySelector('label[for="cep-profissional"]').textContent = 'CEP da Empresa';
-            document.querySelector('label[for="logradouro-profissional"]').textContent = 'Logradouro da Empresa';
-            document.querySelector('label[for="numero-profissional"]').textContent = 'Número da Empresa';
-            document.querySelector('label[for="complemento-profissional"]').textContent = 'Complemento da Empresa';
-            document.querySelector('label[for="bairro-profissional"]').textContent = 'Bairro da Empresa';
-            document.querySelector('label[for="cidade-profissional"]').textContent = 'Cidade da Empresa';
-            document.querySelector('label[for="estado-profissional"]').textContent = 'Estado da Empresa';
-
-            docs.push(
-                "Cartão CNPJ",
-                "Contrato Social ou Estatuto (última alteração)",
-                "Documentos dos Sócios (RG, CPF)",
-                "Comprovante de Endereço da Empresa",
-                "Último Balanço Patrimonial e DRE (se aplicável)",
-                "Comprovante de Faturamento (extratos bancários dos últimos 6 meses da PJ)",
-                "Declaração de IR da Pessoa Jurídica"
-            );
+            informacoesPessoaisSection.querySelector('h2').textContent = 'Informações do Sócio/Representante';
+            enderecoResidencialSection.querySelector('h2').textContent = 'Endereço Residencial do Sócio/Representante';
+            dadosProfissionaisSection.querySelector('h2').textContent = 'Dados Profissionais do Sócio/Representante';
+            document.querySelector('label[for="nome-empresa"]').textContent = 'Nome da Empresa (Sócio)';
+            document.querySelector('label[for="cargo"]').textContent = 'Cargo (Sócio)';
+            document.querySelector('label[for="remuneracao-mensal"]').textContent = 'Pró-labore Mensal (Sócio)';
         }
-    } else {
-        resetPjLabels(); // Garante que labels de PF/PJ estejam resetadas se as seções principais não são mostradas
     }
 
-    if (garantiaFiador && showPrimaryApplicantSections) {
+    if (estadoCivilCasadoUniaoEstavel) {
+        document.getElementById("informacoes-conjuge-section").classList.remove("hidden");
+        toggleSectionInputs(document.getElementById("informacoes-conjuge-section"), true);
+
+        if (isPessoaFisica) {
+            docs.push(
+                "RG do Cônjuge",
+                "CPF do Cônjuge"
+            );
+            const tipoAtividadeConjuge = document.getElementById("tipo-atividade-conjuge").value;
+            if (tipoAtividadeConjuge && !["desempregado", "do-lar"].includes(tipoAtividadeConjuge)) {
+                document.getElementById("dados-profissionais-conjuge-section").classList.remove("hidden");
+                toggleSectionInputs(document.getElementById("dados-profissionais-conjuge-section"), true);
+                docs.push("Comprovante de Renda do Cônjuge", "Declaração de IR do Cônjuge");
+            }
+        }
+    }
+
+    if (garantiaFiador) {
         informacoesFiadorSection.classList.remove("hidden");
         toggleSectionInputs(informacoesFiadorSection, true);
         enderecoFiadorSection.classList.remove("hidden");
@@ -539,279 +490,272 @@ function atualizarDocumentos() {
         toggleSectionInputs(dadosProfissionaisFiadorSection, true);
 
         docs.push(
-            "RG do Fiador",
-            "CPF do Fiador",
-            "Comprovante de residência do Fiador",
-            "Comprovante de Renda do Fiador",
-            "Declaração de IR do Fiador",
-            "Certidão de matrícula atualizada do imóvel do Fiador (deve ser quitado)",
-            "IPTU do imóvel do Fiador"
+            "RG do(s) Fiador(es)",
+            "CPF do(s) Fiador(es)",
+            "Comprovante de Renda do(s) Fiador(es)",
+            "Extrato bancário do(s) Fiador(es) (últimos 90 dias)",
+            "Declaração de IR do(s) Fiador(es)",
+            "Comprovante de residência atual do(s) Fiador(es)",
+            "Matrícula atualizada de imóvel(is) para comprovação da fiança"
         );
-        if (estadoCivilCasadoUniaoEstavel) {
-            docs.push(
-                "RG do Cônjuge do Fiador",
-                "CPF do Cônjuge do Fiador",
-                "Comprovante de Renda do Cônjuge do Fiador",
-                "Declaração de IR do Cônjuge do Fiador"
-            );
-        }
     }
 
-    docs.forEach(doc => {
-        const div = document.createElement("div");
-        div.classList.add("input-group");
-        const fieldName = doc.toLowerCase().normalize('NFD').replace(/[^\w\s]/g, '').replace(/\s+/g, '_');
-        // Removido o atributo 'required' dos inputs de arquivo
-        div.innerHTML = `<label class="required">${doc}:</label><input type="file" name="${fieldName}">`;
-        documentosContainer.appendChild(div);
-    });
+    if (docs.length > 0) {
+        document.getElementById("documentos-section").classList.remove("hidden");
+        docs.forEach(doc => {
+            const sanitizedName = doc.replace(/[^\w\s]/gi, '').replace(/\s/g, '-').toLowerCase();
+            documentosContainer.appendChild(criaCampoDocumento(doc, sanitizedName));
+        });
+    } else {
+        document.getElementById("documentos-section").classList.add("hidden");
+    }
 }
 
-// --- Funções de Validação Global ---
-function validateForm() {
-    let isValid = true;
+// NOVO CÓDIGO - Função para criar campo de documento com novo visual e UX aprimorada
+function criaCampoDocumento(label, name) {
+    const div = document.createElement("div");
+    div.classList.add("file-input-group");
 
-    // Limpa mensagens de erro e bordas de validações anteriores
-    document.querySelectorAll('.input-group .error-message').forEach(msg => {
-        if (msg.textContent === 'Campo obrigatório.') {
-            msg.remove();
+    const labelElement = document.createElement("label");
+    labelElement.classList.add("file-label", "required");
+    labelElement.textContent = `${label}:`;
+    labelElement.setAttribute('for', name);
+
+    const fileContainer = document.createElement("div");
+    fileContainer.classList.add("file-container");
+
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("id", name);
+    input.setAttribute("name", name);
+    input.setAttribute("required", true);
+    input.setAttribute("accept", ".jpg, .jpeg, .pdf");
+
+    const buttonLabel = document.createElement("label");
+    buttonLabel.classList.add("file-button-label");
+    buttonLabel.setAttribute('for', name);
+    buttonLabel.innerHTML = '<i class="fas fa-paperclip"></i> Anexar Arquivo';
+
+    const fileNameSpan = document.createElement("span");
+    fileNameSpan.classList.add("file-name");
+
+    const removeBtn = document.createElement("button");
+    removeBtn.classList.add("remove-file-btn");
+    removeBtn.setAttribute('type', 'button');
+    removeBtn.innerHTML = '<i class="fas fa-times-circle"></i>';
+
+    fileContainer.appendChild(input); // Input escondido
+    fileContainer.appendChild(buttonLabel);
+    fileContainer.appendChild(fileNameSpan);
+    fileContainer.appendChild(removeBtn);
+
+    div.appendChild(labelElement);
+    div.appendChild(fileContainer);
+
+    input.addEventListener('change', function(e) {
+        const maxSizeMB = 5;
+        const maxSizeBytes = maxSizeMB * 1024 * 1024;
+        const acceptedTypes = ['image/jpeg', 'application/pdf'];
+
+        if (this.files.length > 0) {
+            const file = this.files[0];
+            if (file.size > maxSizeBytes || !acceptedTypes.includes(file.type)) {
+                alert(`O arquivo "${file.name}" não é válido. Verifique o tamanho (máx. ${maxSizeMB}MB) e o formato (JPG, JPEG, PDF).`);
+                this.value = ''; // Limpa o input
+                buttonLabel.classList.add('error');
+                buttonLabel.classList.remove('success');
+                fileNameSpan.classList.remove('visible');
+                removeBtn.classList.remove('visible');
+            } else {
+                buttonLabel.classList.remove('error');
+                buttonLabel.classList.add('success');
+                fileNameSpan.textContent = file.name;
+                fileNameSpan.classList.add('visible');
+                removeBtn.classList.add('visible');
+            }
+        } else {
+            buttonLabel.classList.remove('success', 'error');
+            fileNameSpan.textContent = '';
+            fileNameSpan.classList.remove('visible');
+            removeBtn.classList.remove('visible');
         }
     });
-    document.querySelectorAll('.error-border').forEach(el => el.classList.remove('error-border'));
 
-    // Valida os campos da primeira seção de seleção (que sempre são visíveis e required no HTML)
-    const initialSelects = document.querySelectorAll('#tipo-locacao, #tipo-pessoa, #tipo-atividade, #estado-civil, #garantia');
-    initialSelects.forEach(input => {
-        if (!input.value.trim()) {
+    removeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        input.value = null; // Limpa o valor do input
+        buttonLabel.classList.remove('success', 'error');
+        fileNameSpan.textContent = '';
+        fileNameSpan.classList.remove('visible');
+        removeBtn.classList.remove('visible');
+    });
+
+    return div;
+}
+
+// --- Event Listeners ---
+tipoPessoa.addEventListener("change", atualizarDocumentos);
+tipoAtividade.addEventListener("change", atualizarDocumentos);
+estadoCivil.addEventListener("change", atualizarDocumentos);
+tipoLocacao.addEventListener("change", atualizarDocumentos);
+garantia.addEventListener("change", atualizarDocumentos);
+
+const tipoAtividadeConjuge = document.getElementById("tipo-atividade-conjuge");
+if (tipoAtividadeConjuge) {
+    tipoAtividadeConjuge.addEventListener("change", atualizarDocumentos);
+}
+
+if (nacionalidadeSelect) {
+    nacionalidadeSelect.addEventListener('change', toggleNacionalidadeFields);
+}
+const nacionalidadeConjugeSelect = document.getElementById('nacionalidade-conjuge');
+const nacionalidadeConjugeBrasileiraGroup = document.getElementById('nacionalidade-conjuge-brasileira-group');
+const nacionalidadeConjugeEstrangeiraGroup = document.getElementById('nacionalidade-conjuge-estrangeira-group');
+if (nacionalidadeConjugeSelect) {
+    nacionalidadeConjugeSelect.addEventListener('change', function() {
+        if (this.value === 'brasileira') {
+            nacionalidadeConjugeBrasileiraGroup.classList.remove('hidden');
+            nacionalidadeConjugeEstrangeiraGroup.classList.add('hidden');
+            toggleSectionInputs(nacionalidadeConjugeBrasileiraGroup, true);
+            toggleSectionInputs(nacionalidadeConjugeEstrangeiraGroup, false);
+            document.getElementById('uf_nascimento_conjuge').setAttribute('required', 'true');
+            document.getElementById('cidade_nascimento_conjuge').setAttribute('required', 'true');
+        } else if (this.value === 'estrangeira') {
+            nacionalidadeConjugeEstrangeiraGroup.classList.remove('hidden');
+            nacionalidadeConjugeBrasileiraGroup.classList.add('hidden');
+            toggleSectionInputs(nacionalidadeConjugeEstrangeiraGroup, true);
+            toggleSectionInputs(nacionalidadeConjugeBrasileiraGroup, false);
+            document.getElementById('pais_nascimento_conjuge').setAttribute('required', 'true');
+        } else {
+            nacionalidadeConjugeEstrangeiraGroup.classList.add('hidden');
+            nacionalidadeConjugeBrasileiraGroup.classList.add('hidden');
+            toggleSectionInputs(nacionalidadeConjugeEstrangeiraGroup, false);
+            toggleSectionInputs(nacionalidadeConjugeBrasileiraGroup, false);
+        }
+    });
+}
+const fiadorNacionalidadeSelect = document.getElementById('fiador-nacionalidade');
+const fiadorNacionalidadeBrasileiraGroup = document.getElementById('fiador-nacionalidade-brasileira-group');
+const fiadorNacionalidadeEstrangeiraGroup = document.getElementById('fiador-nacionalidade-estrangeira-group');
+const fiadorNacionalidadeDuplaGroup = document.getElementById('fiador-nacionalidade-dupla-group');
+const fiadorNacionalidadeOutraGroup = document.getElementById('fiador-nacionalidade-outra-group');
+if(fiadorNacionalidadeSelect){
+    fiadorNacionalidadeSelect.addEventListener('change', function(){
+        [fiadorNacionalidadeBrasileiraGroup, fiadorNacionalidadeEstrangeiraGroup, fiadorNacionalidadeDuplaGroup, fiadorNacionalidadeOutraGroup].forEach(group => {
+            group.classList.add('hidden');
+            toggleSectionInputs(group, false);
+        });
+        const selectedNacionalidade = this.value;
+        switch(selectedNacionalidade) {
+            case 'brasileira':
+                fiadorNacionalidadeBrasileiraGroup.classList.remove('hidden');
+                toggleSectionInputs(fiadorNacionalidadeBrasileiraGroup, true);
+                document.getElementById('fiador-uf_nascimento').setAttribute('required', 'true');
+                document.getElementById('fiador-cidade_nascimento').setAttribute('required', 'true');
+                break;
+            case 'estrangeira':
+                fiadorNacionalidadeEstrangeiraGroup.classList.remove('hidden');
+                toggleSectionInputs(fiadorNacionalidadeEstrangeiraGroup, true);
+                document.getElementById('fiador-pais_nascimento').setAttribute('required', 'true');
+                document.getElementById('fiador-cidade_origem').removeAttribute('required');
+                break;
+            case 'dupla':
+                fiadorNacionalidadeDuplaGroup.classList.remove('hidden');
+                toggleSectionInputs(fiadorNacionalidadeDuplaGroup, true);
+                document.getElementById('fiador-pais_principal').setAttribute('required', 'true');
+                document.getElementById('fiador-cidade_principal').setAttribute('required', 'true');
+                document.getElementById('fiador-segundo_pais').removeAttribute('required');
+                document.getElementById('fiador-segunda_cidade').removeAttribute('required');
+                break;
+            case 'outra':
+                fiadorNacionalidadeOutraGroup.classList.remove('hidden');
+                toggleSectionInputs(fiadorNacionalidadeOutraGroup, true);
+                document.getElementById('fiador-naturalidade_texto_livre').setAttribute('required', 'true');
+                break;
+        }
+    });
+}
+document.querySelectorAll('input[type="tel"]').forEach(input => {
+    input.addEventListener('input', () => handlePhoneInput(input));
+});
+document.querySelectorAll('input[type="email"]').forEach(input => {
+    input.addEventListener('input', () => handleEmailInput(input));
+});
+document.querySelectorAll('input[name*="cep"]').forEach(input => {
+    input.addEventListener('input', () => formatCepInput(input));
+    input.addEventListener('blur', () => {
+        const type = input.id.includes('residencial') ? 'residencial' : (input.id.includes('profissional') ? 'profissional' : 'fiador-residencial');
+        consultarCep(input, type);
+    });
+});
+document.querySelectorAll('input[name*="cpf"]').forEach(input => {
+    input.addEventListener('input', () => handleCpfInput(input));
+    input.addEventListener('blur', () => handleCpfInput(input));
+});
+document.querySelectorAll('input[name*="rg"]').forEach(input => {
+    input.addEventListener('input', () => handleRgInput(input));
+    input.addEventListener('blur', () => handleRgInput(input));
+});
+document.querySelectorAll('input[name*="remuneracao-mensal"]').forEach(input => {
+    input.addEventListener('input', () => formatCurrencyInput(input));
+});
+
+formCadastro.addEventListener('submit', async function(event) {
+    event.preventDefault();
+    loadingOverlay.classList.add('visible');
+    let isValid = true;
+    const requiredInputs = formCadastro.querySelectorAll('input[required]:not(:disabled), select[required]:not(:disabled)');
+    requiredInputs.forEach(input => {
+        if (!input.value.trim() && input.type !== 'file') {
             isValid = false;
             input.classList.add('error-border');
-            const errorMessageSpan = document.createElement('span');
-            errorMessageSpan.classList.add('error-message');
-            errorMessageSpan.textContent = 'Campo obrigatório.';
-            input.parentNode.insertBefore(errorMessageSpan, input.nextSibling);
-        }
-    });
-
-
-    // Valida dinamicamente todos os inputs dentro das seções visíveis e não desabilitadas
-    const dynamicSections = [
-        informacoesPessoaisSection,
-        enderecoResidencialSection,
-        dadosProfissionaisSection,
-        informacoesFiadorSection,
-        enderecoFiadorSection,
-        dadosProfissionaisFiadorSection,
-        documentosContainer, // Para os inputs de arquivo
-        nacionalidadeBrasileiraGroup, // Inclui os novos grupos de nacionalidade
-        nacionalidadeEstrangeiraGroup,
-        nacionalidadeDuplaGroup,
-        nacionalidadeOutraGroup
-    ];
-
-    dynamicSections.forEach(section => {
-        // Apenas processa se a seção não estiver oculta
-        if (!section.classList.contains('hidden')) {
-            section.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(input => {
-                // Se o input não estiver desabilitado (ou seja, é visível e ativo)
-                if (!input.disabled) {
-                    // Verifica se o campo está vazio E se ele é obrigatório (tem o atributo 'required')
-                    // Ou se ele não é readonly e não está na lista de campos opcionais
-                    const isRequiredByAttribute = input.hasAttribute('required');
-                    const isExplicitlyOptional = optionalFieldIds.includes(input.id);
-
-                    if (input.value.trim() === '' && !input.readOnly && (isRequiredByAttribute || !isExplicitlyOptional)) {
-                        isValid = false;
-                        input.classList.add('error-border');
-                        const existingErrorMessage = input.parentNode.querySelector('.error-message');
-                        if (!existingErrorMessage || existingErrorMessage.textContent === '') {
-                            const errorMessageSpan = document.createElement('span');
-                            errorMessageSpan.classList.add('error-message');
-                            errorMessageSpan.textContent = 'Campo obrigatório.';
-                            input.parentNode.insertBefore(errorMessageSpan, input.nextSibling);
-                        }
-                    } else {
-                        input.classList.remove('error-border');
-                        // Remove a mensagem de erro se o campo for preenchido ou for opcional
-                        const existingErrorMessage = input.parentNode.querySelector('.error-message');
-                        if (existingErrorMessage && existingErrorMessage.textContent === 'Campo obrigatório.') {
-                            existingErrorMessage.remove();
-                        }
-                    }
-                }
-            });
-        }
-    });
-
-
-    // Re-verifica validações específicas para campos que podem ter erros de formato (CPF, RG, Celular, Email)
-    document.querySelectorAll('[id$="-cpf"], [id$="-rg"], [id$="-celular"], [id$="-email"], [id$="-remuneracao-mensal"]').forEach(input => {
-        // Verifica se o input está visível e habilitado antes de validar seu estado
-        const parentSection = input.closest('section');
-        const isVisibleAndEnabled = (!parentSection || !parentSection.classList.contains('hidden')) && !input.disabled;
-
-        if (isVisibleAndEnabled) {
             const errorSpan = input.parentNode.querySelector('.error-message');
-            if (errorSpan && errorSpan.textContent !== '') {
-                isValid = false; // Indica que há um erro de validação de formato
-                input.classList.add('error-border'); // Garante a borda vermelha
-            } else {
-                input.classList.remove('error-border'); // Remove a borda se o campo estiver válido
+            if (errorSpan) errorSpan.textContent = "Campo obrigatório";
+        } else if (input.type === 'file' && input.files.length === 0) {
+            isValid = false;
+            const fileContainer = input.closest('.file-container');
+            if (fileContainer) {
+                const buttonLabel = fileContainer.querySelector('.file-button-label');
+                if(buttonLabel) buttonLabel.classList.add('error');
             }
+        } else {
+            input.classList.remove('error-border');
+            const fileContainer = input.closest('.file-container');
+            if (fileContainer) {
+                const buttonLabel = fileContainer.querySelector('.file-button-label');
+                if(buttonLabel) buttonLabel.classList.remove('error');
+            }
+            const errorSpan = input.parentNode.querySelector('.error-message');
+            if (errorSpan) errorSpan.textContent = "";
         }
     });
 
     if (!isValid) {
-        alert('Por favor, preencha todos os campos obrigatórios e corrija os erros indicados.');
-        const firstInvalid = document.querySelector('.error-border');
-        if (firstInvalid) {
-            firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            firstInvalid.focus();
-        }
+        alert("Por favor, preencha todos os campos obrigatórios.");
+        loadingOverlay.classList.remove('visible');
+        return;
     }
-
-    return isValid;
-}
-
-// Função para limpar todos os campos do formulário
-function clearFormFields() {
-    formCadastro.querySelectorAll('input, select, textarea').forEach(input => {
-        if (input.type === 'file') {
-            input.value = '';
-        } else if (input.type === 'checkbox' || input.type === 'radio') {
-            input.checked = false;
-        } else if (input.tagName === 'SELECT') {
-            input.selectedIndex = 0;
-        } else {
-            input.value = '';
-        }
-
-        input.classList.remove('error-border');
-        input.removeAttribute('required'); // Remove o atributo required ao limpar
-        const errorSpan = input.parentNode.querySelector('.error-message');
-        if (errorSpan) {
-            errorSpan.textContent = '';
-        }
-    });
-
-    informacoesPessoaisSection.classList.add("hidden");
-    enderecoResidencialSection.classList.add("hidden");
-    dadosProfissionaisSection.classList.add("hidden");
-    informacoesFiadorSection.classList.add("hidden");
-    enderecoFiadorSection.classList.add("hidden");
-    dadosProfissionaisFiadorSection.classList.add("hidden");
-
-    atualizarDocumentos(); // Re-executa para redefinir os campos de anexo
-    toggleNacionalidadeFields(); // Reseta os campos de nacionalidade
-}
-
-
-// --- Event Listeners ---
-
-// Listeners para os selects iniciais (sempre presentes)
-[tipoPessoa, tipoAtividade, estadoCivil, tipoLocacao, garantia].forEach(el =>
-    el.addEventListener("change", atualizarDocumentos)
-);
-
-window.addEventListener("DOMContentLoaded", () => {
-    atualizarDocumentos(); // Inicializa as seções e documentos
-    toggleNacionalidadeFields(); // Inicializa os campos de nacionalidade
-});
-
-// Listener para o select de Nacionalidade
-nacionalidadeSelect.addEventListener('change', toggleNacionalidadeFields);
-
-
-// Delegação de eventos para inputs que podem ser adicionados/removidos/habilitados/desabilitados
-formCadastro.addEventListener('input', function(event) {
-    const target = event.target;
-    if (target.disabled) return; // Não processa eventos de campos desabilitados
-
-    switch (target.id) {
-        case 'cep-residencial':
-            formatCepInput(target);
-            consultarCep(target, 'residencial');
-            break;
-        case 'cep-profissional':
-            formatCepInput(target);
-            consultarCep(target, 'profissional');
-            break;
-        case 'cep-fiador-residencial':
-            formatCepInput(target);
-            consultarCep(target, 'fiador-residencial');
-            break;
-        case 'fiador-cep-profissional':
-            formatCepInput(target);
-            consultarCep(target, 'fiador-profissional');
-            break;
-        case 'cpf':
-        case 'fiador-cpf':
-            handleCpfInput(target);
-            break;
-        case 'rg':
-        case 'fiador-rg':
-            handleRgInput(target);
-            break;
-        case 'celular':
-        case 'fiador-celular':
-            handlePhoneInput(target);
-            break;
-        case 'email':
-        case 'fiador-email':
-            handleEmailInput(target);
-            break;
-        case 'remuneracao-mensal':
-        case 'fiador-remuneracao-mensal':
-            formatCurrencyInput(target);
-            break;
-    }
-});
-
-
-formCadastro.addEventListener('submit', async function(event) {
-    event.preventDefault(); // Impede o envio padrão do formulário para validação customizada
-
-    if (!validateForm()) {
-        return; // Para a submissão se a validação falhar
-    }
-
-    // Mostra o overlay de carregamento
-    showLoadingOverlay();
-
-    const form = event.target;
-    const formData = new FormData(form);
-
-    const backendUrl = 'https://formulario-locacao-app-16f3a36a3730.herokuapp.com'; 
-
+    const formData = new FormData(formCadastro);
     try {
-        const response = await fetch(backendUrl, {
-            method: 'POST',
-            body: formData
+        const response = await fetch("https://seu-heroku-app.herokuapp.com/submit", {
+            method: "POST",
+            body: formData,
         });
 
         if (response.ok) {
-            const result = await response.json();
-            clearFormFields(); 
-            hideLoadingOverlay();
-            window.location.href = 'sucesso.html'; 
+            window.location.href = "sucesso.html";
         } else {
-            const errorData = await response.json().catch(() => ({ message: 'Erro desconhecido no servidor.' }));
-            alert(`Erro ao enviar formulário: ${errorData.message || 'Ocorreu um problema ao processar sua solicitação.'}`);
-            console.error('Detalhes do erro do backend:', errorData);
+            alert("Ocorreu um erro ao enviar a ficha. Por favor, tente novamente.");
+            console.error("Erro no servidor:", response.status, response.statusText);
         }
     } catch (error) {
-        alert('Não foi possível conectar ao servidor. Verifique sua conexão ou tente novamente mais tarde.');
-        console.error('Erro na requisição fetch:', error);
+        alert("Não foi possível conectar com o servidor. Verifique sua conexão e tente novamente.");
+        console.error("Erro ao enviar o formulário:", error);
     } finally {
-        // Garante que o overlay seja escondido mesmo em caso de erro na requisição
-        hideLoadingOverlay();
+        loadingOverlay.classList.remove('visible');
     }
 });
 
-// Funções para mostrar e esconder o overlay de carregamento
-function showLoadingOverlay() {
-    loadingOverlay.classList.add('visible');
-}
-
-function hideLoadingOverlay() {
-    loadingOverlay.classList.remove('visible');
-}
+document.addEventListener("DOMContentLoaded", () => {
+    atualizarDocumentos();
+});
