@@ -357,6 +357,7 @@ function resetPjLabels() {
 }
 
 function atualizarDocumentos() {
+    // Esconder todas as seções por padrão e limpá-las
     documentosContainer.innerHTML = "";
     informacoesPessoaisSection.classList.add("hidden");
     toggleSectionInputs(informacoesPessoaisSection, false);
@@ -370,10 +371,14 @@ function atualizarDocumentos() {
     toggleSectionInputs(enderecoFiadorSection, false);
     dadosProfissionaisFiadorSection.classList.add("hidden");
     toggleSectionInputs(dadosProfissionaisFiadorSection, false);
-    document.getElementById("informacoes-conjuge-section").classList.add("hidden");
-    toggleSectionInputs(document.getElementById("informacoes-conjuge-section"), false);
-    document.getElementById("dados-profissionais-conjuge-section").classList.add("hidden");
-    toggleSectionInputs(document.getElementById("dados-profissionais-conjuge-section"), false);
+
+    // Oculta todas as seções do cônjuge no início da função
+    const informacoesConjugeSection = document.getElementById("informacoes-conjuge-section");
+    const dadosProfissionaisConjugeSection = document.getElementById("dados-profissionais-conjuge-section");
+    informacoesConjugeSection.classList.add("hidden");
+    toggleSectionInputs(informacoesConjugeSection, false);
+    dadosProfissionaisConjugeSection.classList.add("hidden");
+    toggleSectionInputs(dadosProfissionaisConjugeSection, false);
 
     const filtrosPreenchidos = tipoLocacao.value && tipoPessoa.value && tipoAtividade.value && estadoCivil.value && garantia.value;
 
@@ -388,7 +393,7 @@ function atualizarDocumentos() {
     const isPessoaJuridica = tipoPessoa.value === "pj";
     const isCLT = tipoAtividade.value === "clt";
     const isLiberalOrEmpresario = ["liberal", "empresario"].includes(tipoAtividade.value);
-
+    
     let docs = [];
 
     const showPrimaryApplicantSections = (isPessoaFisica && (isCLT || isLiberalOrEmpresario || tipoAtividade.value === "aposentado" || tipoAtividade.value === "estudante")) || isPessoaJuridica;
@@ -462,20 +467,21 @@ function atualizarDocumentos() {
             document.querySelector('label[for="remuneracao-mensal"]').textContent = 'Pró-labore Mensal (Sócio)';
         }
     }
-
+    
+    // Lógica para o cônjuge (sem o campo de atividade)
     if (estadoCivilCasadoUniaoEstavel) {
-        document.getElementById("informacoes-conjuge-section").classList.remove("hidden");
-        toggleSectionInputs(document.getElementById("informacoes-conjuge-section"), true);
-
+        informacoesConjugeSection.classList.remove("hidden");
+        toggleSectionInputs(informacoesConjugeSection, true);
+        
         if (isPessoaFisica) {
-            docs.push(
-                "RG do Cônjuge",
-                "CPF do Cônjuge"
-            );
-            const tipoAtividadeConjuge = document.getElementById("tipo-atividade-conjuge").value;
-            if (tipoAtividadeConjuge && !["desempregado", "do-lar"].includes(tipoAtividadeConjuge)) {
-                document.getElementById("dados-profissionais-conjuge-section").classList.remove("hidden");
-                toggleSectionInputs(document.getElementById("dados-profissionais-conjuge-section"), true);
+            docs.push("RG do Cônjuge", "CPF do Cônjuge");
+        }
+
+        // Se a garantia NÃO for fiador, mostre a seção de dados profissionais do cônjuge.
+        if (!garantiaFiador) {
+            if (isPessoaFisica) {
+                dadosProfissionaisConjugeSection.classList.remove("hidden");
+                toggleSectionInputs(dadosProfissionaisConjugeSection, true);
                 docs.push("Comprovante de Renda do Cônjuge", "Declaração de IR do Cônjuge");
             }
         }
@@ -600,14 +606,7 @@ estadoCivil.addEventListener("change", atualizarDocumentos);
 tipoLocacao.addEventListener("change", atualizarDocumentos);
 garantia.addEventListener("change", atualizarDocumentos);
 
-const tipoAtividadeConjuge = document.getElementById("tipo-atividade-conjuge");
-if (tipoAtividadeConjuge) {
-    tipoAtividadeConjuge.addEventListener("change", atualizarDocumentos);
-}
-
-if (nacionalidadeSelect) {
-    nacionalidadeSelect.addEventListener('change', toggleNacionalidadeFields);
-}
+// O Event Listener para o tipoAtividadeConjuge foi removido
 const nacionalidadeConjugeSelect = document.getElementById('nacionalidade-conjuge');
 const nacionalidadeConjugeBrasileiraGroup = document.getElementById('nacionalidade-conjuge-brasileira-group');
 const nacionalidadeConjugeEstrangeiraGroup = document.getElementById('nacionalidade-conjuge-estrangeira-group');
@@ -744,7 +743,7 @@ formCadastro.addEventListener('submit', async function(event) {
 
     const formData = new FormData(formCadastro);
     try {
-        const response = await fetch("https://formulario-locacao-app-16f3a36a3730.herokuapp.com/", {
+        const response = await fetch("https://formulario-locacao-app.herokuapp.com/", {
             method: "POST",
             body: formData,
         });
