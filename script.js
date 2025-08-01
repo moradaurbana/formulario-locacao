@@ -664,8 +664,8 @@ if(fiadorNacionalidadeSelect){
                 toggleSectionInputs(fiadorNacionalidadeDuplaGroup, true);
                 document.getElementById('fiador-pais_principal').setAttribute('required', 'true');
                 document.getElementById('fiador-cidade_principal').setAttribute('required', 'true');
-                document.getElementById('fiador-segundo_pais').removeAttribute('required');
-                document.getElementById('fiador-segunda_cidade').removeAttribute('required');
+                document.getElementById('fiador-segundo-pais').removeAttribute('required');
+                document.getElementById('fiador-segunda-cidade').removeAttribute('required');
                 break;
             case 'outra':
                 fiadorNacionalidadeOutraGroup.classList.remove('hidden');
@@ -752,12 +752,10 @@ formCadastro.addEventListener('submit', async function(event) {
         if (response.ok) {
             window.location.href = "sucesso.html";
         } else {
-            // Redireciona para a página de erro se o envio não for bem-sucedido
             window.location.href = "erro.html";
         }
     } catch (error) {
         console.error("Erro ao enviar o formulário:", error);
-        // Redireciona para a página de erro em caso de falha na conexão
         window.location.href = "erro.html";
     } finally {
         loadingOverlay.classList.remove('visible');
