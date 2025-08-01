@@ -281,7 +281,7 @@ function toggleSectionInputs(section, enable) {
         }
         input.disabled = !enable;
         if (!enable) {
-            input.value = '';
+            // input.value = ''; // Linha comentada para manter o valor do campo
             input.classList.remove('error-border');
             input.removeAttribute('required');
             const errorSpan = input.parentNode.querySelector('.error-message');
