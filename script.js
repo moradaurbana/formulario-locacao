@@ -281,7 +281,7 @@ function toggleSectionInputs(section, enable) {
         }
         input.disabled = !enable;
         if (!enable) {
-            // input.value = ''; // Linha comentada para manter o valor do campo
+            input.value = '';
             input.classList.remove('error-border');
             input.removeAttribute('required');
             const errorSpan = input.parentNode.querySelector('.error-message');
@@ -357,11 +357,6 @@ function resetPjLabels() {
 }
 
 function atualizarDocumentos() {
-    console.log('--- Debug de atualizarDocumentos ---');
-    console.log('tipoPessoa:', tipoPessoa.value);
-    console.log('tipoAtividade:', tipoAtividade.value);
-    console.log('estadoCivil:', estadoCivil.value);
-    console.log('garantia:', garantia.value);
     documentosContainer.innerHTML = "";
     informacoesPessoaisSection.classList.add("hidden");
     toggleSectionInputs(informacoesPessoaisSection, false);
