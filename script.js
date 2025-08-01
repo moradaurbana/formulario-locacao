@@ -744,7 +744,7 @@ formCadastro.addEventListener('submit', async function(event) {
 
     const formData = new FormData(formCadastro);
     try {
-        const response = await fetch("https://formulario-locacao-app.herokuapp.com/", {
+        const response = await fetch("https://formulario-locacao-app-16f3a36a3730.herokuapp.com/", {
             method: "POST",
             body: formData,
         });
