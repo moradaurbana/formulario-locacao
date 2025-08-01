@@ -357,6 +357,11 @@ function resetPjLabels() {
 }
 
 function atualizarDocumentos() {
+    console.log('--- Debug de atualizarDocumentos ---');
+    console.log('tipoPessoa:', tipoPessoa.value);
+    console.log('tipoAtividade:', tipoAtividade.value);
+    console.log('estadoCivil:', estadoCivil.value);
+    console.log('garantia:', garantia.value);
     documentosContainer.innerHTML = "";
     informacoesPessoaisSection.classList.add("hidden");
     toggleSectionInputs(informacoesPessoaisSection, false);
