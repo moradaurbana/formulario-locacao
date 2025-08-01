@@ -29,18 +29,6 @@ const nacionalidadeOutraGroup = document.getElementById('nacionalidade-outra-gro
 
 // --- Funções de Utilitário ---
 
-// Formata data
-function formatDateInput(inputElement) {
-    let value = inputElement.value.replace(/\D/g, '');
-    if (value.length > 8) value = value.substring(0, 8);
-    if (value.length > 4) {
-        value = value.replace(/^(\d{2})(\d{2})(\d{4})$/, '$1/$2/$3');
-    } else if (value.length > 2) {
-        value = value.replace(/^(\d{2})(\d{0,2})$/, '$1/$2');
-    }
-    inputElement.value = value;
-}
-
 // Limpa os campos de endereço
 function clearAddressFields(type) {
     const logradouroInput = document.getElementById("logradouro-" + type);
@@ -711,9 +699,6 @@ document.querySelectorAll('input[name*="rg"]').forEach(input => {
 document.querySelectorAll('input[name*="remuneracao-mensal"]').forEach(input => {
     input.addEventListener('input', () => formatCurrencyInput(input));
 });
-// Event listener adicionado para o campo de data de nascimento
-document.getElementById('data-nascimento').addEventListener('input', (e) => formatDateInput(e.target));
-
 
 formCadastro.addEventListener('submit', async function(event) {
     event.preventDefault();
