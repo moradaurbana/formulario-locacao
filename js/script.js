@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
         console.log('3. Tentando enviar a requisição para o backend...');
-        const response = await fetch('http://localhost:3000/enviar-ficha', {
+        const response = await fetch('https://ficha-locacao-e70b43034247.herokuapp.com/', {
             method: 'POST',
             body: formData,
         });
