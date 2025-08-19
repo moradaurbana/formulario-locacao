@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha Cadastral para Locação - Morada Urbana</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <img src="images/logo2024.png" alt="Logo Morada Urbana" class="logo">
+        <h1>Ficha Cadastral para Locação</h1>
+    </header>
+
+    <main class="container">
+        <form id="rentalForm">
+            <section class="filter-section">
+                <h2>Selecione as opções de locação</h2>
+                
+                <div class="form-group">
+                    <label for="tipoLocacao">Tipo de Locação:</label>
+                    <select id="tipoLocacao" name="tipoLocacao" required>
+                        <option value="">Selecione...</option>
+                        <option value="Residencial">Residencial</option>
+                        <option value="Comercial">Comercial</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="tipoPessoa">Tipo de Pessoa:</label>
+                    <select id="tipoPessoa" name="tipoPessoa" required>
+                        <option value="">Selecione...</option>
+                        <option value="Pessoa Física">Pessoa Física</option>
+                        <option value="Pessoa Jurídica">Pessoa Jurídica</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="atividade-group" style="display: none;">
+                    <label for="tipoAtividade">Tipo de Atividade:</label>
+                    <select id="tipoAtividade" name="tipoAtividade" required>
+                        <option value="">Selecione...</option>
+                        <option value="CLT">CLT</option>
+                        <option value="Profissional liberal">Profissional Liberal</option>
+                        <option value="Empresário">Empresário</option>
+                        <option value="Aposentado/pensionista">Aposentado/Pensionista</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="estadoCivil-group" style="display: none;">
+                    <label for="estadoCivil">Estado Civil:</label>
+                    <select id="estadoCivil" name="estadoCivil" required>
+                        <option value="">Selecione...</option>
+                        <option value="Solteiro(a)">Solteiro(a)</option>
+                        <option value="Divorciado(a)">Divorciado(a)</option>
+                        <option value="Separado(a)">Separado(a)</option>
+                        <option value="Viúvo(a)">Viúvo(a)</option>
+                        <option value="Casado(a)">Casado(a)</option>
+                        <option value="União estável">União estável</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="garantia-group" style="display: none;">
+                    <label for="tipoGarantia">Garantia:</label>
+                    <select id="tipoGarantia" name="tipoGarantia" required>
+                        <option value="">Selecione...</option>
+                        <option value="Fiador">Fiador</option>
+                        <option value="Seguro Fiança">Seguro Fiança</option>
+                        <option value="Título de Capitalização">Título de Capitalização</option>
+                        <option value="Caução">Caução</option>
+                    </select>
+                </div>
+            </section>
+            
+            <section id="form-sections" style="display: none;">
+                <hr>
+                <h2>Preencha seus dados</h2>
+
+                <div id="pf-comum-section" style="display: none;">
+                    <h3>Informações Pessoais</h3>
+                    <div class="form-group">
+                        <label for="nomeCompletoPF">Nome Completo:</label>
+                        <input type="text" id="nomeCompletoPF" name="nomeCompletoPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="cpfPF">CPF:</label>
+                        <input type="text" id="cpfPF" name="cpfPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="rgPF">RG:</label>
+                        <input type="text" id="rgPF" name="rgPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="dataNascimentoPF">Data de Nascimento:</label>
+                        <input type="text" id="dataNascimentoPF" name="dataNascimentoPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="celularPF">Celular (WhatsApp):</label>
+                        <input type="tel" id="celularPF" name="celularPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="emailPF">Email:</label>
+                        <input type="email" id="emailPF" name="emailPF">
+                    </div>
+
+                    <h3>Endereço Residencial</h3>
+                    <div class="form-group">
+                        <label for="cepPF">CEP:</label>
+                        <input type="text" id="cepPF" name="cepPF">
+                        <span id="cep-feedback"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="logradouroPF">Logradouro:</label>
+                        <input type="text" id="logradouroPF" name="logradouroPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="numeroPF">Número:</label>
+                        <input type="text" id="numeroPF" name="numeroPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="complementoPF">Complemento:</label>
+                        <input type="text" id="complementoPF" name="complementoPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="bairroPF">Bairro:</label>
+                        <input type="text" id="bairroPF" name="bairroPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="cidadePF">Cidade:</label>
+                        <input type="text" id="cidadePF" name="cidadePF">
+                    </div>
+                    <div class="form-group">
+                        <label for="estadoPF">Estado:</label>
+                        <input type="text" id="estadoPF" name="estadoPF">
+                    </div>
+
+                    <h3>Dados Profissionais</h3>
+                    <div id="dadosProfissionais-pf-section" style="display: none;">
+                        <div class="form-group" id="empresa-pf-group" style="display: none;">
+                            <label for="nomeEmpresaPF">Nome da empresa:</label>
+                            <input type="text" id="nomeEmpresaPF" name="nomeEmpresaPF">
+                        </div>
+                        <div class="form-group" id="cargo-pf-group" style="display: none;">
+                            <label for="cargoPF">Cargo:</label>
+                            <input type="text" id="cargoPF" name="cargoPF">
+                        </div>
+                        <div class="form-group" id="tempo-empresa-pf-group" style="display: none;">
+                            <label for="tempoEmpresaPF">Tempo de empresa:</label>
+                            <input type="text" id="tempoEmpresaPF" name="tempoEmpresaPF">
+                        </div>
+                        <div class="form-group" id="remuneracao-pf-group" style="display: none;">
+                            <label for="remuneracaoPF">Remuneração mensal:</label>
+                            <input type="text" id="remuneracaoPF" name="remuneracaoPF">
+                        </div>
+                        <div class="form-group" id="cep-empresa-pf-group" style="display: none;">
+                            <label for="cepEmpresaPF">CEP da empresa:</label>
+                            <input type="text" id="cepEmpresaPF" name="cepEmpresaPF">
+                        </div>
+                        <div class="form-group" id="logradouro-empresa-pf-group" style="display: none;">
+                            <label for="logradouroEmpresaPF">Logradouro:</label>
+                            <input type="text" id="logradouroEmpresaPF" name="logradouroEmpresaPF">
+                        </div>
+                        <div class="form-group" id="numero-empresa-pf-group" style="display: none;">
+                            <label for="numeroEmpresaPF">Número:</label>
+                            <input type="text" id="numeroEmpresaPF" name="numeroEmpresaPF">
+                        </div>
+                        <div class="form-group" id="complemento-empresa-pf-group" style="display: none;">
+                            <label for="complementoEmpresaPF">Complemento:</label>
+                            <input type="text" id="complementoEmpresaPF" name="complementoEmpresaPF">
+                        </div>
+                        <div class="form-group" id="bairro-empresa-pf-group" style="display: none;">
+                            <label for="bairroEmpresaPF">Bairro:</label>
+                            <input type="text" id="bairroEmpresaPF" name="bairroEmpresaPF">
+                        </div>
+                        <div class="form-group" id="cidade-empresa-pf-group" style="display: none;">
+                            <label for="cidadeEmpresaPF">Cidade:</label>
+                            <input type="text" id="cidadeEmpresaPF" name="cidadeEmpresaPF">
+                        </div>
+                        <div class="form-group" id="estado-empresa-pf-group" style="display: none;">
+                            <label for="estadoEmpresaPF">Estado:</label>
+                            <input type="text" id="estadoEmpresaPF" name="estadoEmpresaPF">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="conjuge-pf-section" style="display: none;">
+                    <hr>
+                    <h3>Informações do Cônjuge</h3>
+                    <div class="form-group">
+                        <label for="nomeConjugePF">Nome Completo:</label>
+                        <input type="text" id="nomeConjugePF" name="nomeConjugePF">
+                    </div>
+                    <div class="form-group">
+                        <label for="cpfConjugePF">CPF:</label>
+                        <input type="text" id="cpfConjugePF" name="cpfConjugePF">
+                    </div>
+                    <div class="form-group">
+                        <label for="rgConjugePF">RG:</label>
+                        <input type="text" id="rgConjugePF" name="rgConjugePF">
+                    </div>
+                    <div class="form-group">
+                        <label for="dataNascimentoConjugePF">Data de Nascimento:</label>
+                        <input type="text" id="dataNascimentoConjugePF" name="dataNascimentoConjugePF">
+                    </div>
+                    <div class="form-group">
+                        <label for="celularConjugePF">Celular (WhatsApp):</label>
+                        <input type="tel" id="celularConjugePF" name="celularConjugePF">
+                    </div>
+                    <div class="form-group">
+                        <label for="emailConjugePF">Email:</label>
+                        <input type="email" id="emailConjugePF" name="emailConjugePF">
+                    </div>
+                </div>
+
+                <div id="fiador-pf-section" style="display: none;">
+                    <hr>
+                    <h3>Informações do(s) Fiador(es)</h3>
+                    <div class="form-group">
+                        <label for="nomeFiadorPF">Nome Completo:</label>
+                        <input type="text" id="nomeFiadorPF" name="nomeFiadorPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="cpfFiadorPF">CPF:</label>
+                        <input type="text" id="cpfFiadorPF" name="cpfFiadorPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="rgFiadorPF">RG:</label>
+                        <input type="text" id="rgFiadorPF" name="rgFiadorPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="dataNascimentoFiadorPF">Data de Nascimento:</label>
+                        <input type="text" id="dataNascimentoFiadorPF" name="dataNascimentoFiadorPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="celularFiadorPF">Celular (WhatsApp):</label>
+                        <input type="tel" id="celularFiadorPF" name="celularFiadorPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="emailFiadorPF">Email:</label>
+                        <input type="email" id="emailFiadorPF" name="emailFiadorPF">
+                    </div>
+                    
+                    <h4>Endereço Residencial do Fiador</h4>
+                    <div class="form-group">
+                        <label for="cepFiadorPF">CEP:</label>
+                        <input type="text" id="cepFiadorPF" name="cepFiadorPF">
+                        <span id="cep-fiador-feedback"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="logradouroFiadorPF">Logradouro:</label>
+                        <input type="text" id="logradouroFiadorPF" name="logradouroFiadorPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="numeroFiadorPF">Número:</label>
+                        <input type="text" id="numeroFiadorPF" name="numeroFiadorPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="complementoFiadorPF">Complemento:</label>
+                        <input type="text" id="complementoFiadorPF" name="complementoFiadorPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="bairroFiadorPF">Bairro:</label>
+                        <input type="text" id="bairroFiadorPF" name="bairroFiadorPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="cidadeFiadorPF">Cidade:</label>
+                        <input type="text" id="cidadeFiadorPF" name="cidadeFiadorPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="estadoFiadorPF">Estado:</label>
+                        <input type="text" id="estadoFiadorPF" name="estadoFiadorPF">
+                    </div>
+
+                    <h4>Dados Profissionais do Fiador</h4>
+                    <div class="form-group">
+                        <label for="nomeEmpresaFiadorPF">Nome da empresa:</label>
+                        <input type="text" id="nomeEmpresaFiadorPF" name="nomeEmpresaFiadorPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="cargoFiadorPF">Cargo:</label>
+                        <input type="text" id="cargoFiadorPF" name="cargoFiadorPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="tempoEmpresaFiadorPF">Tempo de empresa:</label>
+                        <input type="text" id="tempoEmpresaFiadorPF" name="tempoEmpresaFiadorPF">
+                    </div>
+                    <div class="form-group">
+                        <label for="remuneracaoFiadorPF">Remuneração mensal:</label>
+                        <input type="text" id="remuneracaoFiadorPF" name="remuneracaoFiadorPF">
+                    </div>
+                </div>
+
+                <div id="pj-section" style="display: none;">
+                    <h3>Informações da Empresa</h3>
+                    <div class="form-group">
+                        <label for="cnpjPJ">CNPJ:</label>
+                        <input type="text" id="cnpjPJ" name="cnpjPJ">
+                    </div>
+                    <div class="form-group">
+                        <label for="razaoSocialPJ">Razão Social:</label>
+                        <input type="text" id="razaoSocialPJ" name="razaoSocialPJ">
+                    </div>
+                    <div class="form-group">
+                        <label for="nomeFantasiaPJ">Nome Fantasia:</label>
+                        <input type="text" id="nomeFantasiaPJ" name="nomeFantasiaPJ">
+                    </div>
+                    <div class="form-group">
+                        <label for="cepEmpresaPJ">CEP da Empresa:</label>
+                        <input type="text" id="cepEmpresaPJ" name="cepEmpresaPJ">
+                    </div>
+                    <div class="form-group">
+                        <label for="logradouroEmpresaPJ">Logradouro:</label>
+                        <input type="text" id="logradouroEmpresaPJ" name="logradouroEmpresaPJ">
+                    </div>
+                    <div class="form-group">
+                        <label for="numeroEmpresaPJ">Número:</label>
+                        <input type="text" id="numeroEmpresaPJ" name="numeroEmpresaPJ">
+                    </div>
+                    <div class="form-group">
+                        <label for="complementoEmpresaPJ">Complemento:</label>
+                        <input type="text" id="complementoEmpresaPJ" name="complementoEmpresaPJ">
+                    </div>
+                    <div class="form-group">
+                        <label for="bairroEmpresaPJ">Bairro:</label>
+                        <input type="text" id="bairroEmpresaPJ" name="bairroEmpresaPJ">
+                    </div>
+                    <div class="form-group">
+                        <label for="cidadeEmpresaPJ">Cidade:</label>
+                        <input type="text" id="cidadeEmpresaPJ" name="cidadeEmpresaPJ">
+                    </div>
+                    <div class="form-group">
+                        <label for="estadoEmpresaPJ">Estado:</label>
+                        <input type="text" id="estadoEmpresaPJ" name="estadoEmpresaPJ">
+                    </div>
+
+                    <hr>
+                    <h3>Informações do Sócio/Representante</h3>
+                    <div id="socio-pj-section">
+                        <div class="form-group">
+                            <label for="nomeSocioPJ">Nome Completo:</label>
+                            <input type="text" id="nomeSocioPJ" name="nomeSocioPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="cpfSocioPJ">CPF:</label>
+                            <input type="text" id="cpfSocioPJ" name="cpfSocioPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="rgSocioPJ">RG:</label>
+                            <input type="text" id="rgSocioPJ" name="rgSocioPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="dataNascimentoSocioPJ">Data de Nascimento:</label>
+                            <input type="text" id="dataNascimentoSocioPJ" name="dataNascimentoSocioPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="celularSocioPJ">Celular (WhatsApp):</label>
+                            <input type="tel" id="celularSocioPJ" name="celularSocioPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="emailSocioPJ">Email:</label>
+                            <input type="email" id="emailSocioPJ" name="emailSocioPJ">
+                        </div>
+                        <h4>Endereço Residencial do Sócio/Representante</h4>
+                        <div class="form-group">
+                            <label for="cepSocioPJ">CEP:</label>
+                            <input type="text" id="cepSocioPJ" name="cepSocioPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="logradouroSocioPJ">Logradouro:</label>
+                            <input type="text" id="logradouroSocioPJ" name="logradouroSocioPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="numeroSocioPJ">Número:</label>
+                            <input type="text" id="numeroSocioPJ" name="numeroSocioPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="complementoSocioPJ">Complemento:</label>
+                            <input type="text" id="complementoSocioPJ" name="complementoSocioPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="bairroSocioPJ">Bairro:</label>
+                            <input type="text" id="bairroSocioPJ" name="bairroSocioPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="cidadeSocioPJ">Cidade:</label>
+                            <input type="text" id="cidadeSocioPJ" name="cidadeSocioPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="estadoSocioPJ">Estado:</label>
+                            <input type="text" id="estadoSocioPJ" name="estadoSocioPJ">
+                        </div>
+                    </div>
+                    
+                    <div id="conjuge-pj-section" style="display: none;">
+                        <hr>
+                        <h3>Informações do Cônjuge do Sócio/Representante</h3>
+                        <div class="form-group">
+                            <label for="nomeConjugePJ">Nome Completo:</label>
+                            <input type="text" id="nomeConjugePJ" name="nomeConjugePJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="cpfConjugePJ">CPF:</label>
+                            <input type="text" id="cpfConjugePJ" name="cpfConjugePJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="rgConjugePJ">RG:</label>
+                            <input type="text" id="rgConjugePJ" name="rgConjugePJ">
+                        </div>
+                    </div>
+
+                    <div id="fiador-pj-section" style="display: none;">
+                        <hr>
+                        <h3>Informações do(s) Fiador(es)</h3>
+                        <div class="form-group">
+                            <label for="nomeFiadorPJ">Nome Completo:</label>
+                            <input type="text" id="nomeFiadorPJ" name="nomeFiadorPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="cpfFiadorPJ">CPF:</label>
+                            <input type="text" id="cpfFiadorPJ" name="cpfFiadorPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="rgFiadorPJ">RG:</label>
+                            <input type="text" id="rgFiadorPJ" name="rgFiadorPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="dataNascimentoFiadorPJ">Data de Nascimento:</label>
+                            <input type="text" id="dataNascimentoFiadorPJ" name="dataNascimentoFiadorPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="celularFiadorPJ">Celular (WhatsApp):</label>
+                            <input type="tel" id="celularFiadorPJ" name="celularFiadorPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="emailFiadorPJ">Email:</label>
+                            <input type="email" id="emailFiadorPJ" name="emailFiadorPJ">
+                        </div>
+                        
+                        <h4>Endereço Residencial do Fiador</h4>
+                        <div class="form-group">
+                            <label for="cepFiadorPJ">CEP:</label>
+                            <input type="text" id="cepFiadorPJ" name="cepFiadorPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="logradouroFiadorPJ">Logradouro:</label>
+                            <input type="text" id="logradouroFiadorPJ" name="logradouroFiadorPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="numeroFiadorPJ">Número:</label>
+                            <input type="text" id="numeroFiadorPJ" name="numeroFiadorPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="complementoFiadorPJ">Complemento:</label>
+                            <input type="text" id="complementoFiadorPJ" name="complementoFiadorPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="bairroFiadorPJ">Bairro:</label>
+                            <input type="text" id="bairroFiadorPJ" name="bairroFiadorPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="cidadeFiadorPJ">Cidade:</label>
+                            <input type="text" id="cidadeFiadorPJ" name="cidadeFiadorPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="estadoFiadorPJ">Estado:</label>
+                            <input type="text" id="estadoFiadorPJ" name="estadoFiadorPJ">
+                        </div>
+
+                        <h4>Dados Profissionais do Fiador</h4>
+                        <div class="form-group">
+                            <label for="nomeEmpresaFiadorPJ">Nome da empresa:</label>
+                            <input type="text" id="nomeEmpresaFiadorPJ" name="nomeEmpresaFiadorPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="cargoFiadorPJ">Cargo:</label>
+                            <input type="text" id="cargoFiadorPJ" name="cargoFiadorPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="tempoEmpresaFiadorPJ">Tempo de empresa:</label>
+                            <input type="text" id="tempoEmpresaFiadorPJ" name="tempoEmpresaFiadorPJ">
+                        </div>
+                        <div class="form-group">
+                            <label for="remuneracaoFiadorPJ">Remuneração mensal:</label>
+                            <input type="text" id="remuneracaoFiadorPJ" name="remuneracaoFiadorPJ">
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div id="anexos-pf-section" style="display: none;">
+                    <h2>Documentos Necessários</h2>
+                    <p>Faça o upload dos documentos conforme sua seleção. Os documentos devem ser no formato PNG, JPG, JPEG ou PDF, com tamanho máximo de 1,5 MB.</p>
+
+                    <div id="anexos-pf-list">
+                        </div>
+                </div>
+
+                <div id="anexos-pj-section" style="display: none;">
+                    <h2>Documentos Necessários</h2>
+                    <p>Faça o upload dos documentos conforme sua seleção. Os documentos devem ser no formato PNG, JPG, JPEG ou PDF, com tamanho máximo de 1,5 MB.</p>
+
+                    <div id="anexos-pj-list">
+                        </div>
+                </div>
+
+                <div class="submit-section">
+                    <button type="submit" id="submitBtn">
+                        Enviar
+                    </button>
+                    <div id="loading-indicator" style="display: none;">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </section>
+        </form>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
